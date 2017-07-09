@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en-US" class="no-js">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="profile" href="http://gmpg.org/xfn/11">
+		<script>(function(html){html.className = html.className.replace(/\bno-js\b/,'js')})(document.documentElement);</script>
+<title>Mathematics of Deep Learning: Lecture 7 &#8211; Recovering Tree Models &#8211; Mathematical Aspects of Deep Learning</title>
+<link rel="alternate" type="application/rss+xml" title="Mathematical Aspects of Deep Learning &raquo; Feed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Mathematical Aspects of Deep Learning &raquo; Comments Feed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/comments/feed/" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/elmos.scripts.mit.edu\/mathofdeeplearning\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.5.2"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;if(!g||!g.fillText)return!1;switch(g.textBaseline="top",g.font="600 32px Arial",a){case"flag":return g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3;case"diversity":return g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,d=c[0]+","+c[1]+","+c[2]+","+c[3],g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e;case"simple":return g.fillText(h(55357,56835),0,0),0!==g.getImageData(16,16,1,1).data[0];case"unicode8":return g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0]}return!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i;for(i=Array("simple","flag","unicode8","diversity"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='twentysixteen-jetpack-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/modules/theme-tools/compat/twentysixteen.css?ver=4.4.2' type='text/css' media='all' />
+<link rel='stylesheet' id='twentysixteen-fonts-css'  href='https://fonts.googleapis.com/css?family=Merriweather%3A400%2C700%2C900%2C400italic%2C700italic%2C900italic%7CMontserrat%3A400%2C700%7CInconsolata%3A400&#038;subset=latin%2Clatin-ext' type='text/css' media='all' />
+<link rel='stylesheet' id='genericons-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/_inc/genericons/genericons/genericons.css?ver=3.1' type='text/css' media='all' />
+<link rel='stylesheet' id='twentysixteen-style-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/style.css?ver=4.5.2' type='text/css' media='all' />
+<!--[if lt IE 10]>
+<link rel='stylesheet' id='twentysixteen-ie-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 9]>
+<link rel='stylesheet' id='twentysixteen-ie8-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie8.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 8]>
+<link rel='stylesheet' id='twentysixteen-ie7-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie7.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<link rel='stylesheet' id='jetpack_css-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/css/jetpack.css?ver=4.4.2' type='text/css' media='all' />
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/jquery/jquery.js?ver=1.12.3'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.0'></script>
+<!--[if lt IE 9]>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/html5.js?ver=3.7.3'></script>
+<![endif]-->
+<link rel='https://api.w.org/' href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://elmos.scripts.mit.edu/mathofdeeplearning/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='Mathematics of Deep Learning: Lecture 6 &#8211; Simple hierarchical models' href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/29/mathematics-of-deep-learning-lecture-6-simple-hierarchical-models/' />
+<link rel='next' title='Mathematics of Deep Learning: Lecture 8 &#8211; Hierarchical Generative Models for Deep Learning' href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-8-hierarchical-generative-models-for-deep-learning/' />
+<meta name="generator" content="WordPress 4.5.2" />
+<link rel="canonical" href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-7-recovering-tree-models/" />
+<link rel='shortlink' href='http://wp.me/p8hHyG-36' />
+<link rel="alternate" type="application/json+oembed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/oembed/1.0/embed?url=http%3A%2F%2Felmos.scripts.mit.edu%2Fmathofdeeplearning%2F2017%2F07%2F06%2Fmathematics-of-deep-learning-lecture-7-recovering-tree-models%2F" />
+<link rel="alternate" type="text/xml+oembed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/oembed/1.0/embed?url=http%3A%2F%2Felmos.scripts.mit.edu%2Fmathofdeeplearning%2F2017%2F07%2F06%2Fmathematics-of-deep-learning-lecture-7-recovering-tree-models%2F&#038;format=xml" />
+
+<link rel='dns-prefetch' href='//v0.wordpress.com'>
+<style type='text/css'>img#wpstats{display:none}</style>		<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+		
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Mathematics of Deep Learning: Lecture 7 &#8211; Recovering Tree Models" />
+<meta property="og:url" content="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-7-recovering-tree-models/" />
+<meta property="og:description" content="MathJax.Hub.Config({ TeX: { equationNumbers:{autoNumber: &#8220;AMS&#8221;}} }); Transcribed by Paxton Turner (edited by Asad Lodhia, Elchanan Mossel and Matthew Brennan) Tree Reconstruction II We …" />
+<meta property="article:published_time" content="2017-07-06T17:03:16+00:00" />
+<meta property="article:modified_time" content="2017-07-06T17:03:16+00:00" />
+<meta property="og:site_name" content="Mathematical Aspects of Deep Learning" />
+<meta property="og:image" content="https://s0.wp.com/i/blank.jpg" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary" />
+
+<style id="custom-css-css">body{counter-reset:h2counter}h1{counter-reset:h2counter}h2:before{content:counter(h2counter) ".";counter-increment:h2counter;counter-reset:h3counter}h3:before{content:counter(h2counter) "." counter(h3counter) ".";counter-increment:h3counter}.theorem{display:block;margin:12px 0;font-style:italic}.theorem:before{content:"Theorem.";font-weight:700;font-style:normal}.claim{display:block;margin:12px 0;font-style:italic}.claim:before{content:"Claim.";font-weight:700;font-style:normal}.proposition{display:block;margin:12px 0;font-style:italic}.proposition:before{content:"Proposition.";font-weight:700;font-style:normal}.lemma{display:block;margin:12px 0;font-style:italic}.lemma:before{content:"Lemma.";font-weight:700;font-style:normal}.proof{display:block;margin:12px 0;font-style:normal}.proof:before{content:"Proof.";font-style:italic}.proof:after{content:"\25FC";float:right}.definition{display:block;margin:12px 0;font-style:normal}.definition:before{content:"Definition.";font-weight:700;font-style:normal}.remark{display:block;margin:12px 0;font-style:normal}.remark:before{content:"Remark.";font-weight:700;font-style:normal}</style>
+</head>
+
+<body class="single single-post postid-192 single-format-standard">
+<div id="page" class="site">
+	<div class="site-inner">
+		<a class="skip-link screen-reader-text" href="#content">Skip to content</a>
+
+		<header id="masthead" class="site-header" role="banner">
+			<div class="site-header-main">
+				<div class="site-branding">
+					
+											<p class="site-title"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/" rel="home">Mathematical Aspects of Deep Learning</a></p>
+									</div><!-- .site-branding -->
+
+							</div><!-- .site-header-main -->
+
+					</header><!-- .site-header -->
+
+		<div id="content" class="site-content">
+
+<div id="primary" class="content-area">
+	<main id="main" class="site-main" role="main">
+		
+<article id="post-192" class="post-192 post type-post status-publish format-standard hentry category-uncategorized">
+	<header class="entry-header">
+		<h1 class="entry-title">Mathematics of Deep Learning: Lecture 7 &#8211; Recovering Tree Models</h1>	</header><!-- .entry-header -->
+
+	
+	
+	<div class="entry-content">
+		<p><script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: { equationNumbers:{autoNumber: "AMS"}}
+});
+</script></p>
+
+<p><em> Transcribed by Paxton Turner (edited by Asad Lodhia, Elchanan Mossel and Matthew Brennan) </em></p>
+<h1> Tree Reconstruction II </h1>
+<p> We prove Claim 2 which was left over from last time.</p>
+<p><div class="lemma">
+Fix a constant \(\ell \in \mathbb{N}\). Given a \(d\)-ary tree with percolation parameter \(\lambda < 1\) which is sufficiently large, then
+\[
+\mathbb{P}_{\lambda}\left[\text{root is in an} \, \ell-\text{diluted} \, (d^{\ell} - 1) \, \text{-ary open tree}\right] \geq 1 - \epsilon
+\]
+</div>
+<div class="proof">
+Let<br />
+\[<br />
+f(p) := \mathbb{P}[\text{Bin}(d^\ell, p) \geq d^{\ell} &#8211; 1],<br />
+\]<br />
+and note that \(f\) is monotone in \(p\). We see that \(f(1) = 1\), and \(f(p) = p^{d^\ell} + d^{\ell} (1-p) p^{d^{\ell} &#8211; 1}\). Also<br />
+\[<br />
+f'(1) = d^\ell + d^\ell(d^\ell &#8211; 1 &#8211; d^\ell) = 0.<br />
+\]<br />
+Thus taking \(p^*\) sufficiently close to 1 yields that \(f(p) > p\) for all \(p^* < p < 1\). Also choose \(p^*\) to satisfy \(p^* > 1- \epsilon\). Now choose \(\lambda <1\) such that
+\[
+q = \mathbb{P}[\text{root is connected to all} \, d^\ell \, \text{nodes in the } \, \ell \, \text{level}] \geq p^*/f(p^*).
+\]
+
+Now we apply a recursive argument. Let 
+\[
+p_i = \mathbb{P}[\text{root is in an} \, \ell-\text{diluted} \, (d^\ell - 1) \, \text{-ary open tree for} \, i \cdot \ell \, \text{levels}].
+\]
+We will show by induction that \(p_r \geq p^*\) for all \(r\), which implies the lemma. Note that \(p_0 = 1\) and
+\[
+p_{r+1} \geq q \cdot \mathbb{P}\left[\text{Bin}(d^\ell, p_r) \geq d^{\ell} - 1\right] = \frac{p^* f(p_r)}{f(p^*)} \geq p^*
+\]
+since \(f\) is monotone and \(p_r \ge p^*\) by the induction hypothesis. The lemma is proved. 
+</div>
+<h1> Recovering the Tree Structure </h1>
+<p>We begin with an \(\ell\)-level full binary tree and the size of the alphabet to be \(q = \infty\). We generate \(k\) independent samples of the broadcasting procedure with parameter \( \lambda \) on the tree. </p>
+<p>In contrast to the last lecture, today, we do not know the <i> tree structure </i>, <i> i.e. </i> we only receive the colors of the nodes and do not know which nodes are siblings, cousins, etc. Our goal is to determine how large \(k\) must be to recover the tree structure.</p>
+<p>In practice, these trees are phylogenetic trees, and the information we have are the DNA/amino acid sequences. Thus, usually \(q = 4\), or \(q = 20\). </p>
+<p><b> Question </b>: How large should \(k, \ell, \lambda\) be so that we recover the tree correctly as \(\ell \to \infty\)?</p>
+<h2> Recovering Distances Using Correlations </h2>
+<p> If \(u,v\) are graph distance \(2r\) apart, then<br />
+\[<br />
+\mathbb{P}[\sigma(u) = \sigma(v)] = \lambda^{2r}.<br />
+\]<br />
+ How large should \(k\) be so that all distances can be computed accurately? Trivially, if \(k \lambda^{2\ell &#8211; 2} = 1/2\) and \(d(u,v) = 2 \ell &#8211; 2\), then taking a union bound gives<br />
+\[<br />
+\mathbb{P}[\exists \, \text{sample with} \, \sigma(v) = \sigma(u&#8217;)] \leq 1/2.<br />
+\]<br />
+Then we can&#8217;t say if \(d(u,v) = 2 \ell\) or \(d(u,v) = 2 \ell &#8211; 2\). If we use concentration, then<br />
+\[<br />
+k \geq \log(2^\ell) \left(\frac{1}{\lambda^\ell}\right)^2 \log(1/\delta)<br />
+\]<br />
+allows us to compute distances correctly with probability \(\geq 1 &#8211; \delta\). One can show this with Chernoff bounds, and the details are omitted here. If we compute all of the distances between the leaves correctly, then we trivially can recover the tree structure. However, as noted above, this requires at least \(k \geq c (1/\lambda)^{2 \ell} = |T|^\beta\) samples.</p>
+<h2> Recursive &#8220;Deep&#8221; Algorithms for \(q = \infty\) </h2>
+<p> Computing all of the distances between the leaves seems like too strong of a requirement. This raises the question: Is there a deep algorithm that tries to infer the labels at the internal nodes sample by sample that can recover the tree with fewer samples? We will outline such an algorithm when \( 2 \lambda > 1\).</p>
+<p> After detecting siblings, we want to understand the probability of being able to recover colors at their parents sample by sample. Consider first a small example. Suppose we have a 2-level binary tree with leaves labeled. If there is a 1 in both the left and right branches, then with probability 1, the root is colored 1. However, if no color appears in both branches, we mark the node with a question mark \(?\). Returning to our original problem, we can first apply this procedure to identify siblings among the leaves and the labels of their parents sample by sample, and then apply this to the nodes at level \( \ell &#8211; 1\), and so on.</p>
+<div class="claim">
+If \(2 \lambda > 1\), then there exists \(C(\lambda) > 0\) such that<br />
+\[<br />
+\mathbb{P}[? \, \text{recovered at level} r] \leq 1 &#8211; C(\lambda).<br />
+\]
+</div>
+<div class="proof">
+Note that an internal node is not a ? if its label survives in its left and right subtrees. Therefore<br />
+\begin{align*}<br />
+\mathbb{P}[\text{a node at level } r \, \text{is not} \, ?] &#038;\geq \mathbb{P}[\text{root connected to 2 children}] \\<br />
+&#038;= \mathbb{P}[\text{branching process survives}]^2 \\<br />
+&#038;= C(\lambda) > 0<br />
+\end{align*}<br />
+if \(2 \lambda > 1\).
+</div>
+<p>How many samples are needed to identify all siblings correctly?<br />
+\[<br />
+k= \frac{(1 &#8211; \lambda)^4}{\lambda} \log \left( \frac{2^\ell}{\delta}\right)<br />
+\]<br />
+suffices for error \(\leq \delta\). It turns out that there is a similar bound for recovering the tree if \(2 \lambda > 1,\). As observed above, if we purely used distance methods, then we require \(k \geq c (1/\lambda)^{2 \ell} = |T|^\beta\). However, if \(2 \lambda > 1\), then our &#8220;deep&#8221; algorithm requires only \(k = \log(|T|)\) samples.</p>
+<p> If \(2 \lambda < 1\), then what is true? The goal is to show you can't distinguish between the uniform distribution. Heuristically, we must estimate the probability of getting all question marks \(?\) for the lower bound.
+
+
+<p> <b> Lower bound proof idea: </b> Start with four trees having roots \(a, b, c,\) and \(d\). We want to couple the broadcasting procedure on these trees so that they produce the same data. In such a coupling, we can show<br />
+\[<br />
+\mathbb{P}[\text{generating different samples}] \leq 4(2 \lambda)^\ell.<br />
+\]<br />
+Thus,<br />
+\[<br />
+\mathbb{P}[\text{coupling succeeds}] \geq 1 &#8211; 4k(2 \lambda)^\ell.<br />
+\]<br />
+Thus if we want recover the tree correctly with probability \(\geq 1/\delta\), we need \(k \geq c(2 \lambda)^\ell = \Omega(|T|^{\ell})\) samples (if \( \lambda < 1\)). 
+
+
+<div class="remark">
+If \(2 \lambda < 1\), distance methods do not give optimal sample complexity.
+</div>
+<p> We make the following general conjecture.</p>
+<p> <b> Conjecture </b>: Recursive methods should give optimal complexity.</p>
+<h2> A Recursive Algorithm for \(q = 2\) </h2>
+<p> Next we consider a new model. Now we have a full binary tree, and on all edges, we copy with probability \(\eta\). Our alphabet now has size \(q = 2\), and in particular, we set the &#8220;letters&#8221; to be \(\{-1, 1\}\). </p>
+<p> Using distance methods, we cannot distinguish between<br />
+\[<br />
+\mathbb{E}[\sigma(u) \sigma(v)] = \eta^{2 \ell}, \quad \mathbb{E}[\sigma(v&#8217;) \sigma(v)] = \eta^{2 \ell &#8211; 2}<br />
+\]</p>
+<p>The lower bound for distance methods here is \(k \geq c/\eta^{2 \ell}\), and this is more or less tight. As before, we will instead use a recursive approach: first we identify siblings, and then estimate colors of the parents. To identify parents, use the correlations<br />
+\[<br />
+\mathbb{E}[\sigma(v) \sigma(v&#8217;)] = \eta^2<br />
+\]<br />
+if \(v\) and \(v&#8217;\) are siblings. We use correlations to recover distances up to a constant \(i\) levels above. And this requires \(\approx \log(2^\ell)\) samples to concentrate. Then we can use majority vote to recover the color of the parent. By a similar computation to the 2nd moment method from last lecture, if \(2 \eta^2 > 1\),<br />
+\[<br />
+\mathbb{P}[\text{Maj}(x_1, \ldots, x_{2^r}) = x_{\text{root}}] \geq \frac{1}{2} + \epsilon<br />
+\]<br />
+for all \(r\). Thus we define<br />
+\[<br />
+\hat{\sigma}_i = \text{Maj}\left(\sigma_i(u): u \, \text{leaf below} \, v \right).<br />
+\]<br />
+Note that<br />
+\[<br />
+\mathbb{E}[\sigma_{\text{root}} \hat{\sigma}_{\text{root}}] = \rho > 0 \Rightarrow \mathbb{E}[\hat{\sigma}_i(v) \hat{\sigma}_i(w)] = \eta^{2d(v,w)} \rho^2.<br />
+\]<br />
+Also note that \(\rho = \Theta(\epsilon)\). </p>
+<p> <b> Results </b> If \(2 \eta^2 > 1\), we can recover the tree with \(k = \log(|T|)\) samples. Otherwise, \(k \geq |T|^\beta\). Compare this to the thresholds \(d \eta^2 > 1\) for count reconstruction and \(d \lambda_2^2 > 1\) for general broadcasting. </p>
+<h2> Four point method for detecting distances</h2>
+<p> We define a new twist on the previous model. The parameter \(\eta\) is now non-uniform, but we still require it to satisfy \(2 \eta^2(e) \geq 1 + \epsilon\) for all edges \(e\). In this general set-up, one has to be more careful with detecting distances/siblings. </p>
+<p> <b> Four point method </b>: This is a trick from phylogeny. For the purposes of detecting distances, there are 3 possible 2 level binary trees. The neighbors are either \(\{(A, B), (C,D)\}\), \(\{(A, C), (B, D) \}\), and \(\{ (A, D), (B, C) \}\). We use pairwise distances to determine which tree it is. Set<br />
+\[<br />
+Dist(u,v) = \log\left( \frac{1}{\mathbb{E}[\sigma_u \sigma_v]}\right).<br />
+\]</p>
+<div class="claim"> The correct pairing of \(A, B, C\) and \(D\) is the one for which<br />
+\[<br />
+Dist(X,Y) + Dist(W,V)<br />
+\]<br />
+is minimal, where \((X, Y, W, V)\) is some permutation of \((A, B, C, D)\).
+</div>
+<p> Now to determine siblings of \(v\), find all vertices with<br />
+\[<br />
+|Dist(u,v)| \leq 3 \log(1/\sqrt{2}),<br />
+\]<br />
+and apply the four point method on these vertices.</p>
+<p> One can also run into an issue when estimating the colors of parents. To solve this, use an \(\ell\) level recursive estimator.</p>
+<div class="theorem"> If \(2 \eta^2 > 1\), then there exists \(\ell(\eta)\) such that using an \(\ell\)-level recursive majority gives estimator \(\hat{\sigma}\) such that<br />
+\[<br />
+\mathbb{E}[\sigma \hat{\sigma}] \geq 1/2 + \epsilon.<br />
+\]
+</div>
+<p>In the next lecture, we discuss hierarchical generative models. </p>
+	</div><!-- .entry-content -->
+
+	<footer class="entry-footer">
+		<span class="byline"><span class="author vcard"><img alt='' src='http://2.gravatar.com/avatar/b149ee3c951d4c5946a62273f37709b6?s=49&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/b149ee3c951d4c5946a62273f37709b6?s=98&amp;d=mm&amp;r=g 2x' class='avatar avatar-49 photo' height='49' width='49' /><span class="screen-reader-text">Author </span> <a class="url fn n" href="http://elmos.scripts.mit.edu/mathofdeeplearning/author/elmos/">elmos</a></span></span><span class="posted-on"><span class="screen-reader-text">Posted on </span><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-7-recovering-tree-models/" rel="bookmark"><time class="entry-date published updated" datetime="2017-07-06T17:03:16+00:00">July 6, 2017</time></a></span>			</footer><!-- .entry-footer -->
+</article><!-- #post-## -->
+
+	<nav class="navigation post-navigation" role="navigation">
+		<h2 class="screen-reader-text">Post navigation</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/29/mathematics-of-deep-learning-lecture-6-simple-hierarchical-models/" rel="prev"><span class="meta-nav" aria-hidden="true">Previous</span> <span class="screen-reader-text">Previous post:</span> <span class="post-title">Mathematics of Deep Learning: Lecture 6 &#8211; Simple hierarchical models</span></a></div><div class="nav-next"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-8-hierarchical-generative-models-for-deep-learning/" rel="next"><span class="meta-nav" aria-hidden="true">Next</span> <span class="screen-reader-text">Next post:</span> <span class="post-title">Mathematics of Deep Learning: Lecture 8 &#8211; Hierarchical Generative Models for Deep Learning</span></a></div></div>
+	</nav>
+	</main><!-- .site-main -->
+
+	
+</div><!-- .content-area -->
+
+
+	<aside id="secondary" class="sidebar widget-area" role="complementary">
+		<section id="search-2" class="widget widget_search">
+<form role="search" method="get" class="search-form" action="http://elmos.scripts.mit.edu/mathofdeeplearning/">
+	<label>
+		<span class="screen-reader-text">Search for:</span>
+		<input type="search" class="search-field" placeholder="Search &hellip;" value="" name="s" />
+	</label>
+	<button type="submit" class="search-submit"><span class="screen-reader-text">Search</span></button>
+</form>
+</section>		<section id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widget-title">Recent Posts</h2>		<ul>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-8-hierarchical-generative-models-for-deep-learning/">Mathematics of Deep Learning: Lecture 8 &#8211; Hierarchical Generative Models for Deep Learning</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-7-recovering-tree-models/">Mathematics of Deep Learning: Lecture 7 &#8211; Recovering Tree Models</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/29/mathematics-of-deep-learning-lecture-6-simple-hierarchical-models/">Mathematics of Deep Learning: Lecture 6 &#8211; Simple hierarchical models</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/28/mathematics-of-deep-learning-lecture-5-random-sparse-nets-etc/">Mathematics of Deep Learning: Lecture 5 &#8211; Random Sparse Nets etc.</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/08/mathematics-of-deep-learning-lecture-4/">Mathematics of Deep Learning: Lecture 4 &#8211; PAC Learning and Deep Nets</a>
+						</li>
+				</ul>
+		</section>		<section id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widget-title">Recent Comments</h2><ul id="recentcomments"></ul></section><section id="archives-2" class="widget widget_archive"><h2 class="widget-title">Archives</h2>		<ul>
+			<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/'>July 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/'>May 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/'>April 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/03/'>March 2017</a></li>
+		</ul>
+		</section><section id="categories-2" class="widget widget_categories"><h2 class="widget-title">Categories</h2>		<ul>
+	<li class="cat-item cat-item-1"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/category/uncategorized/" >Uncategorized</a>
+</li>
+		</ul>
+</section><section id="meta-2" class="widget widget_meta"><h2 class="widget-title">Meta</h2>			<ul>
+						<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-login.php">Log in</a></li>
+			<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/feed/">Entries <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/comments/feed/">Comments <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="https://wordpress.org/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform.">WordPress.org</a></li>			</ul>
+			</section>	</aside><!-- .sidebar .widget-area -->
+
+		</div><!-- .site-content -->
+
+		<footer id="colophon" class="site-footer" role="contentinfo">
+			
+			
+			<div class="site-info">
+								<span class="site-title"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/" rel="home">Mathematical Aspects of Deep Learning</a></span>
+				<a href="https://wordpress.org/">Proudly powered by WordPress</a>
+			</div><!-- .site-info -->
+		</footer><!-- .site-footer -->
+	</div><!-- .site-inner -->
+</div><!-- .site -->
+
+	<div style="display:none">
+	<div class="grofile-hash-map-b149ee3c951d4c5946a62273f37709b6">
+	</div>
+	</div>
+<script type='text/javascript' src='http://s0.wp.com/wp-content/js/devicepx-jetpack.js?ver=201727'></script>
+<script type='text/javascript' src='http://s.gravatar.com/js/gprofiles.js?ver=2017Julaa'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/modules/wpgroho.js?ver=4.5.2'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/skip-link-focus-fix.js?ver=20160412'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var screenReaderText = {"expand":"expand child menu","collapse":"collapse child menu"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/functions.js?ver=20160412'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/wp-embed.min.js?ver=4.5.2'></script>
+<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=default&#038;ver=1.3.6'></script>
+<script type='text/javascript' src='http://stats.wp.com/e-201727.js' async defer></script>
+<script type='text/javascript'>
+	_stq = window._stq || [];
+	_stq.push([ 'view', {v:'ext',j:'1:4.4.2',blog:'122429706',post:'192',tz:'0',srv:'elmos.scripts.mit.edu'} ]);
+	_stq.push([ 'clickTrackerInit', '122429706', '192' ]);
+</script>
+</body>
+</html>

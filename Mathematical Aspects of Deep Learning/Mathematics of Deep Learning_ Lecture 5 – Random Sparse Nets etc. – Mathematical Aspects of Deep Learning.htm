@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en-US" class="no-js">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="profile" href="http://gmpg.org/xfn/11">
+		<script>(function(html){html.className = html.className.replace(/\bno-js\b/,'js')})(document.documentElement);</script>
+<title>Mathematics of Deep Learning: Lecture 5 &#8211; Random Sparse Nets etc. &#8211; Mathematical Aspects of Deep Learning</title>
+<link rel="alternate" type="application/rss+xml" title="Mathematical Aspects of Deep Learning &raquo; Feed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Mathematical Aspects of Deep Learning &raquo; Comments Feed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/comments/feed/" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/elmos.scripts.mit.edu\/mathofdeeplearning\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.5.2"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;if(!g||!g.fillText)return!1;switch(g.textBaseline="top",g.font="600 32px Arial",a){case"flag":return g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3;case"diversity":return g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,d=c[0]+","+c[1]+","+c[2]+","+c[3],g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e;case"simple":return g.fillText(h(55357,56835),0,0),0!==g.getImageData(16,16,1,1).data[0];case"unicode8":return g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0]}return!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i;for(i=Array("simple","flag","unicode8","diversity"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='twentysixteen-jetpack-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/modules/theme-tools/compat/twentysixteen.css?ver=4.4.2' type='text/css' media='all' />
+<link rel='stylesheet' id='twentysixteen-fonts-css'  href='https://fonts.googleapis.com/css?family=Merriweather%3A400%2C700%2C900%2C400italic%2C700italic%2C900italic%7CMontserrat%3A400%2C700%7CInconsolata%3A400&#038;subset=latin%2Clatin-ext' type='text/css' media='all' />
+<link rel='stylesheet' id='genericons-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/_inc/genericons/genericons/genericons.css?ver=3.1' type='text/css' media='all' />
+<link rel='stylesheet' id='twentysixteen-style-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/style.css?ver=4.5.2' type='text/css' media='all' />
+<!--[if lt IE 10]>
+<link rel='stylesheet' id='twentysixteen-ie-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 9]>
+<link rel='stylesheet' id='twentysixteen-ie8-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie8.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 8]>
+<link rel='stylesheet' id='twentysixteen-ie7-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie7.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<link rel='stylesheet' id='jetpack_css-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/css/jetpack.css?ver=4.4.2' type='text/css' media='all' />
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/jquery/jquery.js?ver=1.12.3'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.0'></script>
+<!--[if lt IE 9]>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/html5.js?ver=3.7.3'></script>
+<![endif]-->
+<link rel='https://api.w.org/' href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://elmos.scripts.mit.edu/mathofdeeplearning/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='Mathematics of Deep Learning: Lecture 4 &#8211; PAC Learning and Deep Nets' href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/08/mathematics-of-deep-learning-lecture-4/' />
+<link rel='next' title='Mathematics of Deep Learning: Lecture 6 &#8211; Simple hierarchical models' href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/29/mathematics-of-deep-learning-lecture-6-simple-hierarchical-models/' />
+<meta name="generator" content="WordPress 4.5.2" />
+<link rel="canonical" href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/28/mathematics-of-deep-learning-lecture-5-random-sparse-nets-etc/" />
+<link rel='shortlink' href='http://wp.me/p8hHyG-2F' />
+<link rel="alternate" type="application/json+oembed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/oembed/1.0/embed?url=http%3A%2F%2Felmos.scripts.mit.edu%2Fmathofdeeplearning%2F2017%2F05%2F28%2Fmathematics-of-deep-learning-lecture-5-random-sparse-nets-etc%2F" />
+<link rel="alternate" type="text/xml+oembed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/oembed/1.0/embed?url=http%3A%2F%2Felmos.scripts.mit.edu%2Fmathofdeeplearning%2F2017%2F05%2F28%2Fmathematics-of-deep-learning-lecture-5-random-sparse-nets-etc%2F&#038;format=xml" />
+
+<link rel='dns-prefetch' href='//v0.wordpress.com'>
+<style type='text/css'>img#wpstats{display:none}</style>		<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+		
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Mathematics of Deep Learning: Lecture 5 &#8211; Random Sparse Nets etc." />
+<meta property="og:url" content="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/28/mathematics-of-deep-learning-lecture-5-random-sparse-nets-etc/" />
+<meta property="og:description" content="MathJax.Hub.Config({ TeX: { equationNumbers: { autoNumber: &#8220;AMS&#8221; }, extensions: [&#8220;AMSmath.js&#8221;]} }); Transcribed by Jiaoyang Huang (edited by Asad Lodhia, Elchanan Mossel and…" />
+<meta property="article:published_time" content="2017-05-28T17:07:25+00:00" />
+<meta property="article:modified_time" content="2017-06-15T23:50:23+00:00" />
+<meta property="og:site_name" content="Mathematical Aspects of Deep Learning" />
+<meta property="og:image" content="https://s0.wp.com/i/blank.jpg" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary" />
+
+<style id="custom-css-css">body{counter-reset:h2counter}h1{counter-reset:h2counter}h2:before{content:counter(h2counter) ".";counter-increment:h2counter;counter-reset:h3counter}h3:before{content:counter(h2counter) "." counter(h3counter) ".";counter-increment:h3counter}.theorem{display:block;margin:12px 0;font-style:italic}.theorem:before{content:"Theorem.";font-weight:700;font-style:normal}.claim{display:block;margin:12px 0;font-style:italic}.claim:before{content:"Claim.";font-weight:700;font-style:normal}.proposition{display:block;margin:12px 0;font-style:italic}.proposition:before{content:"Proposition.";font-weight:700;font-style:normal}.lemma{display:block;margin:12px 0;font-style:italic}.lemma:before{content:"Lemma.";font-weight:700;font-style:normal}.proof{display:block;margin:12px 0;font-style:normal}.proof:before{content:"Proof.";font-style:italic}.proof:after{content:"\25FC";float:right}.definition{display:block;margin:12px 0;font-style:normal}.definition:before{content:"Definition.";font-weight:700;font-style:normal}.remark{display:block;margin:12px 0;font-style:normal}.remark:before{content:"Remark.";font-weight:700;font-style:normal}</style>
+</head>
+
+<body class="single single-post postid-165 single-format-standard">
+<div id="page" class="site">
+	<div class="site-inner">
+		<a class="skip-link screen-reader-text" href="#content">Skip to content</a>
+
+		<header id="masthead" class="site-header" role="banner">
+			<div class="site-header-main">
+				<div class="site-branding">
+					
+											<p class="site-title"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/" rel="home">Mathematical Aspects of Deep Learning</a></p>
+									</div><!-- .site-branding -->
+
+							</div><!-- .site-header-main -->
+
+					</header><!-- .site-header -->
+
+		<div id="content" class="site-content">
+
+<div id="primary" class="content-area">
+	<main id="main" class="site-main" role="main">
+		
+<article id="post-165" class="post-165 post type-post status-publish format-standard hentry category-uncategorized">
+	<header class="entry-header">
+		<h1 class="entry-title">Mathematics of Deep Learning: Lecture 5 &#8211; Random Sparse Nets etc.</h1>	</header><!-- .entry-header -->
+
+	
+	
+	<div class="entry-content">
+		<p><script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: { equationNumbers: { autoNumber: "AMS" }, extensions: ["AMSmath.js"]}
+});
+</script></p>
+
+<p><em> Transcribed by Jiaoyang Huang (edited by Asad Lodhia, Elchanan Mossel and Matthew Brennan) </em></p>
+<p>For today&#8217;s lecture we will present two papers. The first one is <a href="https://arxiv.org/abs/1310.6343"> <em> Provable Bounds for Learning Some Deep Representations </em> </a> by Arora, Bhaskara, Ge and Ma. They proved that random sparse neural networks are learnable. The second paper is <a href="https://arxiv.org/abs/1509.01240"> <em>Train faster, generalize better: Stability of stochastic gradient descent </em> </a> by Hardt, Recht and Singer. Their main results state that any model trained with stochastic gradient method in a reasonable amount of time attains small generalization error.</p>
+<h1> Provable Bounds for Learning Some Deep Representations </h1>
+<p>The sparse random network model has \(\ell\) layers of vectors of binary variables \(h^{(\ell)}, h^{(\ell-1)},\cdots, h^{(1)}\) (where \(h^{(\ell)}\) is the top layer) and an observed layer \(h^{(0)}\) at bottom. Each layer has \(n\) nodes.<br />
+\begin{align}<br />
+\mathrm{Depth}=\ell, \qquad \mathrm{Width}=n.<br />
+\end{align}<br />
+The activation function is the sgn function, i.e.<br />
+\begin{align}<br />
+    \sigma(x)=\left\{<br />
+    \begin{array}{cc}<br />
+    1 &#038; x>0,\\<br />
+    0 &#038; x=0,\\<br />
+    -1 &#038; x<0.
+    \end{array}
+    \right.
+\end{align}
+The network between two layers is a random graph with average degree \(d=n^{\gamma}\) with \(0<\gamma\leq 0.2\). More precisely, each node at level \(k\) is connected to each node at level \(k-1\) with probability \(n^{\gamma-1}\) independently. The edge weights are random in \(\{\pm 1\}\) with probability \(1/2\) each. For any vertex \(i\) in the \(k\)-th layer, and vertex \(j\) in the \((k-1)\)-th layer, the weight \(W_{ji}^{k-1}\in \{-1,0,1\}\) is such that 
+\begin{align}
+W_{ji}^{k-1}
+=\left\{
+\begin{array}{cc}
+0 &#038; \text{there is no edge between \(i,j\).}\\
+-1 &#038; \text{there is an edge with weight \(-1\) between \(i,j\).}\\
+1 &#038; \text{there is an edge with weight \(1\) between \(i,j\).}
+\end{array}
+\right.
+\end{align}
+We remark that \(W^{k-1}\) is the weighted adjacency matrix between \((k-1)\)-th and \(k\)-th layers.
+
+
+The samples are generated from top to bottom. Given \(h^{(k)}\), the vector in the \(k\)-th layer, the vector in the \((k-1)\)-th layer is \(h^{(k-1)}=\mathrm{sgn}(W^{k-1}h^{(k)})\),
+\begin{align}
+h^{(k-1)}_j=\mathrm{sgn}\left(\sum_{i=1}^n W^{k-1}_{ji}h^{(k)}_i\right),\quad j=1,2,\cdots, n.
+\end{align}
+
+We sample the top layer \(h^{(\ell)}\), where the set of nodes that are \(1\) is picked uniformly among all sets of size \(\rho_\ell n\). \(\rho_\ell\) is called the density of the top layer, and we assume that \(\rho_\ell (d/2)^\ell=O(1)\). Since averagely, each node has \(d\) children nodes, the density at level \(k\) is roughly of size \(\rho_\ell d^{\ell-k}\ll1\), and \(h^{(k)}\) is also a sparse vector.
+
+The main theorem we will prove is the following:
+
+
+<div class="theorem"> When degree \(d=n^{\gamma}\), for \(0<\gamma\leq 0.2\), with density \(\rho_\ell (d/2)^{\ell}=O(1)\), the network model can be learned with high probability using \(O(\log n/\rho_\ell^2)\) samples and \(O(n^2\ell)\) time. </div>
+<p>Thanks to the sparsity, the net should approximately preserve information, and allows easily going back/forth between representations in two adjacent layers. In the following we first focus on learning a single-layer network.  It has a top layer with vector \(h^{(1)}\) and a bottom layer with vector \(h^{(0)}\). We assume that \(h^{(1)}\) is sampled among sparse vectors,  and then \(h^{(0)}\) is generated using \(h^{(1)}\). To learn a single-layer network, we need first to recover the network structure. Then for each sample, we need to recover \(h^{(1)}\) from \(h^{(0)}\). </p>
+<p>Given a single-layer network (with known graph structure), the property that we can recover \(h^{(1)}\) from \(h^{(0)}\) is characterized by the following definition:</p>
+<div class='definition'> Fix an activation function. An autoencoder consists of a decoding function \(D(h)=s(Wh+b)\) and an encoding function \(E(h)=s(W&#8217;h+b&#8217;)\) where \(W,W&#8217;\) are linear transformations, \(b,b&#8217;\) are fixed vectors and \(s\) is an activation function, which acts on each coordinate. The autoencoder is said to be well denoising if \(E(D(h)\oplus \xi)=h\) with high probability with respect to the noise \(\xi\) and the randomness of \(h\), where \(D(h)\oplus\xi\) means that \(D(h)\) is corrupted by noise \(\xi\). The autoencoder is called weight tying if \(W&#8217;=W^T\). </div>
+<p>We will show that a single-layer random network is a denoising autoencoder if the input layer and noise are both sparse.</p>
+<div class='lemma'> A one layer network with density \( \rho\) satisfying \(\rho d<0.1\) is a denoising autoencoder with high probability, with respect to noise that flips every output bit independently with probability \(<0.1\). Furthermore this autoencoder is weight tying. </div>
+<div class='proof'> We denote \(W\) the weighted adjacency matrix between the top layer and the bottom layer. By definition, the one layer network implements the encoder \(E(y)=\textrm{sgn}(W^Ty)\). We will show that the one layer network is an autoencoder with decoder \(D(h)=\textrm{sgn}(Wh)\) with high probability. Note that this will also imply it is weight tying.</p>
+<p>Let \(S\) be the support of the top layer \(h^{(1)}\), and \(S&#8217;\) be the support of the bottom layer \(h^{(0)}\).  The key property for the sparse network is that most neighbors of an activated node are unique. More precisely, fix \(i\) in the top layer, and \(j\in {\cal N}(i)\) in the bottom layer, where \({\cal N}(i)\) is the set of neighbor vertices of \(i\), i.e. \(W_{ji}\neq 0\). Thanks to the sparsity assumption, with high probability, \(j\) has no non-zero neighbor other than \(i\), i.e.<br />
+\begin{align}<br />
+{\mathbb P}(|{\cal N}(j)\cap S\setminus \{i\}|\geq 1)\leq \rho d<0.1.
+\end{align}
+If \({\cal N}(j)\cap S\setminus \{i\}=\emptyset\), and \(h_j^{(0)}\) was not flipped by the noise, then \(h_{i}^{(1)}=W_{ji}h_j^{(0)}\). Moreover, 
+\begin{align}
+{\mathbb P}({\cal N}(j)\cap S\setminus \{i\}=\emptyset {\text{ and \(h_j^{(0)}\) was not flipped by the noise}})< 0.2.
+\end{align}
+Motivated by these observations, we can recover \(h^{(1)}\) using the following quantity,
+\begin{align}
+I_{i}=\sum_{j\in {\cal N}(i)}W_{ji}h_j^{(0)}.
+\end{align}
+If \(|I_i|\geq d/2\), then we set \(h_i^{(1)}=sgn(I_i)\). Otherwise, if \(|I_i| < d/2 \), we set \(h_i^{(1)}=0\). </div>
+<p>In the following we focus on learning the structure of a single-layer network. We recall that \(h^{(1)}\) is sampled among sparse vectors (with density \(\rho\)),  and then \(h^{(0)}\) is generated using \(h^{(1)}\). The graph structure can be recovered using \(\mathrm{poly}(n)\) samples.</p>
+<div class='lemma'> Given \(\mathrm{poly}(n)\) samples, one can recover \(W\) the weighted adjacency matrix (between the top layer \(0\) and \(1\)).  </div>
+<div class='proof'>  We define a \(\sim\) relation among vertices in the bottom layer: call two nodes \(i_1,i_2\) at the bottom layer related, denoted by \(i_1\sim i_2\), if they are connected to the same node at the top layer. We can identify related nodes by their correlations. If \(i_1\sim i_2\), then they have common neighbors. With probability \(\rho\), one of their common neighbors is non-zero, so<br />
+\begin{align}<br />
+\mathbb E\left[h_{i_1}^{(0)}h_{i_2}^{(0)}\right]\approx \rho.<br />
+\end{align}<br />
+If \(i_1\not\sim i_2\), then they do not have common neighbors. With good probability, at least one of them is zero<br />
+\begin{align}<br />
+\mathbb E\left[h_{i_1}^{(0)}h_{i_2}^{(0)}\right]\approx 0.<br />
+\end{align}<br />
+Once we recovered the \(\sim\) relations, the recovering of the graph structure is straightforward. In fact we can name vertices in the top layer by largest clusters in the bottom layer. More precisely, each vertex in the top layer corresponds to a largest cluster \(A\) in the bottom layer such that \(|A|\geq 0.1d\) and for any \(i,j\in A\), \(i\sim j\). This approach can be strengthened to include some errors by identifying clusters that are different in less than \(0.1d\) nodes, i.e. we identify \(A\) and \(A&#8217;\) if \(|A\Delta A&#8217;|\leq 0.1 d\). </div>
+<p>The high level network inference algorithm in the paper learns the network layer by layer starting from the bottom. For the network between \(i\)-th and \((i+1)\)-th layers, the algorithm first recover the network structure between levels \(i\) and \(i+1\). Then it recovers \(h^{(i+1)}\) from \(h^{(i)}\) for each sample as above. </p>
+<p>There is a technical issue. In the original model, we sample \(h^{(\ell)}\) uniformly among all the sparse vectors, then sequentially generate \(h^{(\ell-1)}, h^{(\ell-2)}, \cdots, h^{(0)}\). The bits of \(h^{(i+1)}\) are not independent! We can not directly use the Lemma above to recover the network structure between levels \(i\) and \(i+1\). However, this problem can be resolved by showing that the bits of \(h^{(i+1)}\) cannot be too correlated, unless they have a common ancestor. Moreover, the correlation decays exponentially, i.e.<br />
+\begin{align}<br />
+\text{grandparents correlation }\leq 1/d  \text{ parent correlation.}<br />
+\end{align} </p>
+<h1> Train Faster, Generalize Better: Stability of Stochastic Gradient Descent </h1>
+<p>Let&#8217;s consider the following general setting of supervised learning. There is an unknown distribution \(\cal D\). We receive a sample \(S=(z_1,z_2,\cdots, z_n)\) of \(n\) i.i.d. examples drawn from \(\cal D\). Let \(f(w, z)\) denote the a loss function where \(w\) specifies the model and \(z\) denotes an example. Our goal is to minimize the population risk:<br />
+\begin{align}<br />
+R[w]:= {\mathbb E}_{z\sim \cal D}[f(w,z)],<br />
+\end{align}<br />
+over all possible models \(w\). Since the distribution \(\cal D\) is unknown, we cannot measure the quantity \(R[w]\) directly, we instead minimize the empirical risk:<br />
+\begin{align}<br />
+R_S[w]:=\frac{1}{n}\sum_{i=1}^n f(w,z_i).<br />
+\end{align}<br />
+The generalization error of a model \(w\) is the difference<br />
+\begin{align}<br />
+R_S[w]-R[w].<br />
+\end{align}<br />
+If \(w=A(S)\) is chosen as a function of the data by a possibly random algorithm \(A\), we need to estimate the expected generalization error<br />
+\begin{align}<br />
+\varepsilon_{gen}:=\mathbb E_{S,A}[R_S[A(S)]-R[A(S)]].<br />
+\end{align}</p>
+<p>In order to bound the generalization error, we recall the following definition of uniform stability, </p>
+<div class='definition'> The algorithm \(A\) is \(\varepsilon\)-uniform stable if for all data sets \(S, S&#8217;\) that differ at most one example:<br />
+\begin{align}<br />
+\sup_{z}\mathbb E_{A}[f(A(S),z)-f(A(S&#8217;),z)]\leq \varepsilon.<br />
+\end{align}<br />
+We define \(\varepsilon_{Stab}(A,n)\) the smallest such \(\varepsilon\). </div>
+<div class='claim'> The generalization error can be controlled by \(\varepsilon_{Stab}(A,n)\):<br />
+\begin{align}<br />
+|\mathbb E_{S,A}[R_S[A(S)]-R[A(S)]]|\leq \varepsilon_{Stab}(A,n).<br />
+\end{align} </div>
+<div class='proof'> Denote by \(S=(z_1,z_2,\cdots, z_n)\) and \(S&#8217;=(z_1&#8242;,z_2&#8242;,\cdots,z_n&#8217;)\) two independent random samples and let \(S^{(i)}=(z_1,\cdots, z_{i-1}, z_i&#8217;,z_{i+1},\cdots,z_n)\). With these notations we have<br />
+\begin{align}\begin{split}<br />
+\mathbb E_{S}\mathbb E_{A}[R_S[A(S)]]<br />
+&#038;=\mathbb E_{S}\mathbb E_{A}\left[\frac{1}{n}\sum_{i=1}^n f(A(S),z_i)\right]\\<br />
+&#038;=\mathbb E_{S}\mathbb E_{S&#8217;}\mathbb E_{A}\left[\frac{1}{n}\sum_{i=1}^n f(A(S^{(i)}),z_i&#8217;)\right]\\<br />
+&#038;=\mathbb E_{S}\mathbb E_{S&#8217;}\mathbb E_{A}\left[\frac{1}{n}\sum_{i=1}^n f(A(S),z_i&#8217;)\right]+\delta\\<br />
+&#038;=\mathbb E_{S}\mathbb E_{A}\left[R[A(S)]\right]+\delta,<br />
+\end{split}\end{align}<br />
+where<br />
+\begin{align}<br />
+|\delta|&#038;=\left|\mathbb E_{S}\mathbb E_{S&#8217;}\mathbb E_{A}\left[\frac{1}{n}\sum_{i=1}^n \left(f(A(S^{(i)}),z_i&#8217;)-f(A(S),z_i&#8217;)\right)\right]\right| \\<br />
+&#038;\leq \varepsilon_{Stab}(A,n).<br />
+\end{align}<br />
+This finishes the proof.</div>
+<p>In the following we show that for stochastic gradient iterative algorithms, we can control their uniform stability, and obtain some upper bound on the generalization error.</p>
+<p>Given the loss function \(f(w,z)\), the stochastic gradient update with learning rate \(\alpha_t>0\) is given by<br />
+\begin{align}<br />
+w_{t+1}=w_t-\alpha_t \nabla_w f(w_t, z_{i_t})<br />
+\end{align}<br />
+where the indices \(i_t\) are either picked uniformly randomly in \(\{1,2,\cdots,n\}\), or picked according to a random permutation.</p>
+<p>In the rest of the lecture, we analyze the stochastic gradient descent with convex minimization. Let me first discuss a little bit of convexity,</p>
+<div class='claim'> If \(f\) is convex and \(\nabla f\) is \(\beta\)-Lipschitz then<br />
+\begin{align}\label{e:coercive}<br />
+\langle \nabla f(v)-\nabla f(w), v-w\rangle \geq \frac{1}{\beta}\|\nabla f(v)-\nabla f(w)\|_2^2.<br />
+\end{align}
+</div>
+<div class='proof'>  First we prove that<br />
+\begin{align}\label{e:sconvex1}<br />
+f(y)\geq f(x)+\nabla f(x)^T(y-x)+\frac{1}{2\beta}\|\nabla f(y)-\nabla f(x)\|^2_2.<br />
+\end{align}<br />
+Then by symmetry, we have<br />
+\begin{align}\label{e:sconvex2}<br />
+f(x)\geq f(y)+\nabla f(y)^T(x-y)+\frac{1}{2\beta}\|\nabla f(y)-\nabla f(x)\|^2_2.<br />
+\end{align}<br />
+Our claim \eqref{e:coercive} follows by taking sum of \eqref{e:sconvex1} and \eqref{e:sconvex2}. </p>
+<p>For the proof of \eqref{e:sconvex1}, we introduce a new function<br />
+\begin{align}<br />
+g(z)=f(z)-\nabla f(x)^T z.<br />
+\end{align}<br />
+Then \(g(z)\) is convex and \(\nabla g\) is \(\beta\)-Lipschitz. Moreover, thanks to the convexity of \(f\), i.e.<br />
+\begin{align}<br />
+f(z)\geq f(x)+\nabla f(x)^T(z-x),<br />
+\end{align}<br />
+ \(g\) achieves its minimum at \(z=x\).</p>
+<p>Since \(\nabla g\) is \(\beta\)-Lipschitz, by the Taylor expansion, for any \(z\),<br />
+\begin{align}<br />
+g(z)\leq g(y)+\nabla g(y)^T(z-y)+\frac{\beta}{2}\|z-y\|_2^2.<br />
+\end{align}<br />
+By taking the minimum on both sides,<br />
+\begin{equation}<br />
+\begin{split}<br />
+g(x)<br />
+&#038;=\min_z\{ g(z)\}\\<br />
+&#038;\leq \min_z\left\{g(y)+\nabla g(y)^T(z-y)+\frac{\beta}{2}\|z-y\|_2^2\right\}\\<br />
+&#038;=g(y)-\frac{1}{2\beta}\|\nabla g(y)\|_2^2,<br />
+\end{split}<br />
+\end{equation}<br />
+which is \eqref{e:sconvex1}.  </p></div>
+<p>We prove the stability bound for convex loss minimization via stochastic gradient method.</p>
+<div class="theorem"> Assume that for all \(z\), \(f(\cdot, z)\) is convex and \(L\)-Lipschitz, and \(\nabla f\) is \(\beta\)-Lipschitz. Suppose that we run the stochastic gradient  method for \(T\) steps with step sizes \(\alpha_t\leq 2/\beta\), then<br />
+\begin{align}<br />
+\varepsilon_{Stab}\leq \frac{2L^2}{n}\sum_{t=1}^T\alpha_t.<br />
+\end{align}
+</div>
+<div class='proof'> Let \(S\) and \(S&#8217;\) be two samples of size \(n\) differing in only a single example. Let \(\{w_t\}\) and \(\{w_t&#8217;\}\) be two runs of the algorithm with data sets \(S\) and \(S&#8217;\), and \(\delta_t=\|w_t-w_t&#8217;\|_2\).</p>
+<p>We couple the two algorithms with data sets \(S\) and \(S&#8217;\). At step \(t\), there are two cases: with probability \(1-1/n\), the algorithms choose the same data example; with probability \(1/n\), the algorithms choose different data examples.</p>
+<p>If the two algorithms choose the same data example \(z\) at step \(t\), then<br />
+\begin{equation}<br />
+\begin{split}<br />
+\delta_{t+1}^2<br />
+=&#038;\|w_t-w_t&#8217; -\alpha_t(\nabla f(w_t, z)-\nabla f(w&#8217;_t,z))\|^2_2\\<br />
+=&#038;\|w_t-w_t&#8217;\|^2 +\alpha_t^2\|\nabla f(w_t, z)-\nabla f(w&#8217;_t,z))\|^2_2\\<br />
+&#038;-2\alpha_t\langle w_t-w_t&#8217;, \nabla f(w_t, z)-\nabla f(w&#8217;_t,z)\rangle\\<br />
+\leq&#038; \|w_t-w_t&#8217;\|^2=\delta_t^2,<br />
+\end{split}<br />
+\end{equation}<br />
+provided that \(\alpha_t\leq 2/\beta\), where we used \eqref{e:coercive}.</p>
+<p>If the two algorithms choose different data examples \(z\) and \(z&#8217;\), then<br />
+\begin{equation}<br />
+\begin{split}<br />
+\delta_{t+1}&#038;=\|w_t-w_t&#8217; -\alpha_t(\nabla f(w_t, z)-\nabla f(w&#8217;_t,z))\|_2\\<br />
+&#038;\leq \|w_t-w_t&#8217;\|_2+ \alpha_t\left(\|\nabla f(w_t, z)\|_2+\|\nabla f(w&#8217;_t,z))\|_2\right)\\<br />
+&#038;\leq \delta_t+2\alpha_tL.<br />
+\end{split}<br />
+\end{equation}</p>
+<p>Since the first case happens with probability \(1-1/n\), and the second case happens with probability \(1/n\). In average, we have<br />
+\begin{equation}<br />
+\begin{split}<br />
+\mathbb E[\delta_{t+1}]&#038;\leq \left(1-\frac{1}{n}\right)\mathbb E[\delta_t]+<br />
+\frac{1}{n}\mathbb E[\delta_t+2\alpha_t L]\\<br />
+&#038;=\mathbb E [\delta_t]+\frac{2\alpha_tL}{n}.<br />
+\end{split}<br />
+\end{equation}<br />
+Overall, we have<br />
+\begin{align}<br />
+\mathbb E[\delta_{T}]\leq\frac{2L}{n}\sum_{i=1}^T\alpha_t,<br />
+\end{align}<br />
+and<br />
+\begin{align}<br />
+|f(w_T,z)-f(W&#8217;_T,z)|\leq L \|w_T-w_T&#8217;\|_2\leq \frac{2L^2}{n}\sum_{i=1}^T\alpha_t.<br />
+\end{align}<br />
+This finishes the proof.</p></div>
+	</div><!-- .entry-content -->
+
+	<footer class="entry-footer">
+		<span class="byline"><span class="author vcard"><img alt='' src='http://2.gravatar.com/avatar/b149ee3c951d4c5946a62273f37709b6?s=49&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/b149ee3c951d4c5946a62273f37709b6?s=98&amp;d=mm&amp;r=g 2x' class='avatar avatar-49 photo' height='49' width='49' /><span class="screen-reader-text">Author </span> <a class="url fn n" href="http://elmos.scripts.mit.edu/mathofdeeplearning/author/elmos/">elmos</a></span></span><span class="posted-on"><span class="screen-reader-text">Posted on </span><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/28/mathematics-of-deep-learning-lecture-5-random-sparse-nets-etc/" rel="bookmark"><time class="entry-date published" datetime="2017-05-28T17:07:25+00:00">May 28, 2017</time><time class="updated" datetime="2017-06-15T23:50:23+00:00">June 15, 2017</time></a></span>			</footer><!-- .entry-footer -->
+</article><!-- #post-## -->
+
+	<nav class="navigation post-navigation" role="navigation">
+		<h2 class="screen-reader-text">Post navigation</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/08/mathematics-of-deep-learning-lecture-4/" rel="prev"><span class="meta-nav" aria-hidden="true">Previous</span> <span class="screen-reader-text">Previous post:</span> <span class="post-title">Mathematics of Deep Learning: Lecture 4 &#8211; PAC Learning and Deep Nets</span></a></div><div class="nav-next"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/29/mathematics-of-deep-learning-lecture-6-simple-hierarchical-models/" rel="next"><span class="meta-nav" aria-hidden="true">Next</span> <span class="screen-reader-text">Next post:</span> <span class="post-title">Mathematics of Deep Learning: Lecture 6 &#8211; Simple hierarchical models</span></a></div></div>
+	</nav>
+	</main><!-- .site-main -->
+
+	
+</div><!-- .content-area -->
+
+
+	<aside id="secondary" class="sidebar widget-area" role="complementary">
+		<section id="search-2" class="widget widget_search">
+<form role="search" method="get" class="search-form" action="http://elmos.scripts.mit.edu/mathofdeeplearning/">
+	<label>
+		<span class="screen-reader-text">Search for:</span>
+		<input type="search" class="search-field" placeholder="Search &hellip;" value="" name="s" />
+	</label>
+	<button type="submit" class="search-submit"><span class="screen-reader-text">Search</span></button>
+</form>
+</section>		<section id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widget-title">Recent Posts</h2>		<ul>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-8-hierarchical-generative-models-for-deep-learning/">Mathematics of Deep Learning: Lecture 8 &#8211; Hierarchical Generative Models for Deep Learning</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-7-recovering-tree-models/">Mathematics of Deep Learning: Lecture 7 &#8211; Recovering Tree Models</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/29/mathematics-of-deep-learning-lecture-6-simple-hierarchical-models/">Mathematics of Deep Learning: Lecture 6 &#8211; Simple hierarchical models</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/28/mathematics-of-deep-learning-lecture-5-random-sparse-nets-etc/">Mathematics of Deep Learning: Lecture 5 &#8211; Random Sparse Nets etc.</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/08/mathematics-of-deep-learning-lecture-4/">Mathematics of Deep Learning: Lecture 4 &#8211; PAC Learning and Deep Nets</a>
+						</li>
+				</ul>
+		</section>		<section id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widget-title">Recent Comments</h2><ul id="recentcomments"></ul></section><section id="archives-2" class="widget widget_archive"><h2 class="widget-title">Archives</h2>		<ul>
+			<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/'>July 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/'>May 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/'>April 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/03/'>March 2017</a></li>
+		</ul>
+		</section><section id="categories-2" class="widget widget_categories"><h2 class="widget-title">Categories</h2>		<ul>
+	<li class="cat-item cat-item-1"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/category/uncategorized/" >Uncategorized</a>
+</li>
+		</ul>
+</section><section id="meta-2" class="widget widget_meta"><h2 class="widget-title">Meta</h2>			<ul>
+						<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-login.php">Log in</a></li>
+			<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/feed/">Entries <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/comments/feed/">Comments <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="https://wordpress.org/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform.">WordPress.org</a></li>			</ul>
+			</section>	</aside><!-- .sidebar .widget-area -->
+
+		</div><!-- .site-content -->
+
+		<footer id="colophon" class="site-footer" role="contentinfo">
+			
+			
+			<div class="site-info">
+								<span class="site-title"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/" rel="home">Mathematical Aspects of Deep Learning</a></span>
+				<a href="https://wordpress.org/">Proudly powered by WordPress</a>
+			</div><!-- .site-info -->
+		</footer><!-- .site-footer -->
+	</div><!-- .site-inner -->
+</div><!-- .site -->
+
+	<div style="display:none">
+	<div class="grofile-hash-map-b149ee3c951d4c5946a62273f37709b6">
+	</div>
+	</div>
+<script type='text/javascript' src='http://s0.wp.com/wp-content/js/devicepx-jetpack.js?ver=201727'></script>
+<script type='text/javascript' src='http://s.gravatar.com/js/gprofiles.js?ver=2017Julaa'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/modules/wpgroho.js?ver=4.5.2'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/skip-link-focus-fix.js?ver=20160412'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var screenReaderText = {"expand":"expand child menu","collapse":"collapse child menu"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/functions.js?ver=20160412'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/wp-embed.min.js?ver=4.5.2'></script>
+<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=default&#038;ver=1.3.6'></script>
+<script type='text/javascript' src='http://stats.wp.com/e-201727.js' async defer></script>
+<script type='text/javascript'>
+	_stq = window._stq || [];
+	_stq.push([ 'view', {v:'ext',j:'1:4.4.2',blog:'122429706',post:'165',tz:'0',srv:'elmos.scripts.mit.edu'} ]);
+	_stq.push([ 'clickTrackerInit', '122429706', '165' ]);
+</script>
+</body>
+</html>

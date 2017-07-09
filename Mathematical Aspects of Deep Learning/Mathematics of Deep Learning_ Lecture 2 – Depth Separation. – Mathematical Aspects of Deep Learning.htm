@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en-US" class="no-js">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="profile" href="http://gmpg.org/xfn/11">
+		<script>(function(html){html.className = html.className.replace(/\bno-js\b/,'js')})(document.documentElement);</script>
+<title>Mathematics of Deep Learning: Lecture 2 &#8211; Depth Separation. &#8211; Mathematical Aspects of Deep Learning</title>
+<link rel="alternate" type="application/rss+xml" title="Mathematical Aspects of Deep Learning &raquo; Feed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Mathematical Aspects of Deep Learning &raquo; Comments Feed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/comments/feed/" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/elmos.scripts.mit.edu\/mathofdeeplearning\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.5.2"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;if(!g||!g.fillText)return!1;switch(g.textBaseline="top",g.font="600 32px Arial",a){case"flag":return g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3;case"diversity":return g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,d=c[0]+","+c[1]+","+c[2]+","+c[3],g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e;case"simple":return g.fillText(h(55357,56835),0,0),0!==g.getImageData(16,16,1,1).data[0];case"unicode8":return g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0]}return!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i;for(i=Array("simple","flag","unicode8","diversity"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='twentysixteen-jetpack-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/modules/theme-tools/compat/twentysixteen.css?ver=4.4.2' type='text/css' media='all' />
+<link rel='stylesheet' id='twentysixteen-fonts-css'  href='https://fonts.googleapis.com/css?family=Merriweather%3A400%2C700%2C900%2C400italic%2C700italic%2C900italic%7CMontserrat%3A400%2C700%7CInconsolata%3A400&#038;subset=latin%2Clatin-ext' type='text/css' media='all' />
+<link rel='stylesheet' id='genericons-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/_inc/genericons/genericons/genericons.css?ver=3.1' type='text/css' media='all' />
+<link rel='stylesheet' id='twentysixteen-style-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/style.css?ver=4.5.2' type='text/css' media='all' />
+<!--[if lt IE 10]>
+<link rel='stylesheet' id='twentysixteen-ie-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 9]>
+<link rel='stylesheet' id='twentysixteen-ie8-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie8.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 8]>
+<link rel='stylesheet' id='twentysixteen-ie7-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie7.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<link rel='stylesheet' id='jetpack_css-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/css/jetpack.css?ver=4.4.2' type='text/css' media='all' />
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/jquery/jquery.js?ver=1.12.3'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.0'></script>
+<!--[if lt IE 9]>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/html5.js?ver=3.7.3'></script>
+<![endif]-->
+<link rel='https://api.w.org/' href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://elmos.scripts.mit.edu/mathofdeeplearning/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='Mathematics of Deep Learning: Lecture 1- Introduction and the Universality of Depth 1 Nets' href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/03/09/mathematics-of-deep-learning-lecture-1/' />
+<link rel='next' title='Mathematics of Deep Learning: Lecture 3 &#8211; More on depth separation.' href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/14/mathematics-of-deep-learning-lecture-3/' />
+<meta name="generator" content="WordPress 4.5.2" />
+<link rel="canonical" href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/09/mathematics-of-deep-learning-lecture-2/" />
+<link rel='shortlink' href='http://wp.me/p8hHyG-1w' />
+<link rel="alternate" type="application/json+oembed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/oembed/1.0/embed?url=http%3A%2F%2Felmos.scripts.mit.edu%2Fmathofdeeplearning%2F2017%2F04%2F09%2Fmathematics-of-deep-learning-lecture-2%2F" />
+<link rel="alternate" type="text/xml+oembed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/oembed/1.0/embed?url=http%3A%2F%2Felmos.scripts.mit.edu%2Fmathofdeeplearning%2F2017%2F04%2F09%2Fmathematics-of-deep-learning-lecture-2%2F&#038;format=xml" />
+
+<link rel='dns-prefetch' href='//v0.wordpress.com'>
+<style type='text/css'>img#wpstats{display:none}</style>		<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+		
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Mathematics of Deep Learning: Lecture 2 &#8211; Depth Separation." />
+<meta property="og:url" content="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/09/mathematics-of-deep-learning-lecture-2/" />
+<meta property="og:description" content="MathJax.Hub.Config({ TeX: { equationNumbers:{autoNumber: &#8220;AMS&#8221;}} }); Transcribed by Julien Edward Clancy (edited by Asad Lodhia, Elchanan Mossel and Matthew Brennan) Last lecture we saw…" />
+<meta property="article:published_time" content="2017-04-09T01:29:47+00:00" />
+<meta property="article:modified_time" content="2017-06-21T21:14:07+00:00" />
+<meta property="og:site_name" content="Mathematical Aspects of Deep Learning" />
+<meta property="og:image" content="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/04/m_iterates-300x225.png" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary" />
+
+<style id="custom-css-css">body{counter-reset:h2counter}h1{counter-reset:h2counter}h2:before{content:counter(h2counter) ".";counter-increment:h2counter;counter-reset:h3counter}h3:before{content:counter(h2counter) "." counter(h3counter) ".";counter-increment:h3counter}.theorem{display:block;margin:12px 0;font-style:italic}.theorem:before{content:"Theorem.";font-weight:700;font-style:normal}.claim{display:block;margin:12px 0;font-style:italic}.claim:before{content:"Claim.";font-weight:700;font-style:normal}.proposition{display:block;margin:12px 0;font-style:italic}.proposition:before{content:"Proposition.";font-weight:700;font-style:normal}.lemma{display:block;margin:12px 0;font-style:italic}.lemma:before{content:"Lemma.";font-weight:700;font-style:normal}.proof{display:block;margin:12px 0;font-style:normal}.proof:before{content:"Proof.";font-style:italic}.proof:after{content:"\25FC";float:right}.definition{display:block;margin:12px 0;font-style:normal}.definition:before{content:"Definition.";font-weight:700;font-style:normal}.remark{display:block;margin:12px 0;font-style:normal}.remark:before{content:"Remark.";font-weight:700;font-style:normal}</style>
+</head>
+
+<body class="single single-post postid-94 single-format-standard">
+<div id="page" class="site">
+	<div class="site-inner">
+		<a class="skip-link screen-reader-text" href="#content">Skip to content</a>
+
+		<header id="masthead" class="site-header" role="banner">
+			<div class="site-header-main">
+				<div class="site-branding">
+					
+											<p class="site-title"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/" rel="home">Mathematical Aspects of Deep Learning</a></p>
+									</div><!-- .site-branding -->
+
+							</div><!-- .site-header-main -->
+
+					</header><!-- .site-header -->
+
+		<div id="content" class="site-content">
+
+<div id="primary" class="content-area">
+	<main id="main" class="site-main" role="main">
+		
+<article id="post-94" class="post-94 post type-post status-publish format-standard hentry category-uncategorized">
+	<header class="entry-header">
+		<h1 class="entry-title">Mathematics of Deep Learning: Lecture 2 &#8211; Depth Separation.</h1>	</header><!-- .entry-header -->
+
+	
+	
+	<div class="entry-content">
+		<p><script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: { equationNumbers:{autoNumber: "AMS"}}
+});
+</script></p>
+
+<p><em> Transcribed by Julien Edward Clancy (edited by Asad Lodhia, Elchanan Mossel and Matthew Brennan) </em></p>
+<p>Last lecture we saw the most basic theorem about neural network approximation: that for most activation functions, including any \( \sigma \colon \mathbb{R} \to \mathbb{R} \) such that \( \sigma(x) \to 0 \) as \( x \to -\infty \) and \( \sigma(x) \to 1 \) as \( x \to \infty \), and also including the ReLU function, we can represent almost any function given enough neurons, with small error in any reasonable norm. One of the proofs relied on Fourier analysis. The simpler one was to observe that by scaling and translating to \( \sigma(\lambda x + b) \) for large \( \lambda \) and some \( b \) we can approximate the function<br />
+\[<br />
+f(x) = \chi_{[a, \infty)}(x)<br />
+\]<br />
+for every \( a \). By subtracting one of these from another we can approximate the indicator of any interval, and by standard arguments we can: 1) approximate any continuous function in the uniform sense, and 2) approximate any \( L^2 \) function in the \( L^2 \) sense. The last observation can also be adapted to Sobolev spaces, or even more detailed function classes.</p>
+<p>An argument can be made that the result above has little to do with the practice of neural networks. Deep networks have gained currency because of their expressive power relative to their size and number of parameters &#8212; though the networks used in practice have millions of nodes, they dramatically outpace shallow networks of the same size. The first order of business of this lecture is to take a step towards explaining this.</p>
+<h1> Telgarsky&#8217;s Depth Separation: 0-1 Loss </h1>
+<p>For the result we&#8217;re about to state (from a paper of Telgarsky that can be found <a href="https://arxiv.org/pdf/1509.08101.pdf"> here </a>) let&#8217;s consider ReLU networks. Let \( m(x) \) be the piecewise linear function that is \( 2x \) if \( x \in [0, 0.5] \), \( 2-2x \) if \( x \in [0.5, 1] \), and \( 0 \) otherwise. This looks like:</p>
+<p><center><br />
+<img src="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/03/fig_1-300x201.png" alt="lect2-fig1" width="300" height="201" class="alignnone size-medium wp-image-97" srcset="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/03/fig_1-300x201.png 300w, http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/03/fig_1-768x514.png 768w, http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/03/fig_1.png 935w" sizes="(max-width: 300px) 85vw, 300px" /><br />
+</center></p>
+<p>This can be computed exactly by a two- or three-layer network, depending on your notational preferences, by the expression<br />
+\[<br />
+\sigma( 2 \sigma(x) &#8211; 4 \sigma(x &#8211; 0.5) )<br />
+\]<br />
+which is a diamond-shaped network:</p>
+<p><center><br />
+<img src="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/04/diamond_network-265x300.png" alt="diamond_network" width="265" height="300" class="alignnone size-medium wp-image-134" srcset="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/04/diamond_network-265x300.png 265w, http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/04/diamond_network-768x869.png 768w, http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/04/diamond_network.png 800w" sizes="(max-width: 265px) 85vw, 265px" /><br />
+</center></p>
+<p>or in terms of the activation function:</p>
+<p><center><br />
+<img src="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/03/fig_3-300x198.png" alt="lecture2-fig_3" width="300" height="198" class="alignnone size-medium wp-image-105" srcset="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/03/fig_3-300x198.png 300w, http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/03/fig_3-768x506.png 768w, http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/03/fig_3-1024x674.png 1024w, http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/03/fig_3.png 1042w" sizes="(max-width: 300px) 85vw, 300px" /><br />
+</center></p>
+<p>where the function \( m \) is slightly offset for clarity. Since we&#8217;re looking at deep networks, what do iterates of this function look like? Here are the first four:</p>
+<p><center><br />
+<img src="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/04/m_iterates-300x225.png" alt="m_iterates" width="300" height="225" class="alignnone size-medium wp-image-135" srcset="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/04/m_iterates-300x225.png 300w, http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/04/m_iterates-768x576.png 768w, http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/04/m_iterates.png 969w" sizes="(max-width: 300px) 85vw, 300px" /><br />
+</center></p>
+<p>Each iteration replaces the triangle with two triangles that are half as wide (but of the same height), so \( m^{(n)}(x) \) has \( 2^n \) &#8220;teeth&#8221;. Moreover, by chaining these networks, we can obviously represent this function with \( 3n+1 \) nodes in a deep network. However, it should take very many nodes to do this in a shallow network. Intuitively, depth increases the number of oscillations multiplicatively (which is why we have an exponential number of teeth) whereas width can only do so additively. The precise (and fairly strong) version of this intuition states:</p>
+<div class="theorem">
+Given a function \( f \) and data points \( (x_i, y_i) \), define its classification error by<br />
+\[<br />
+R(f) = \frac{1}{n} \sum_i \chi\{\tilde{f}(x_i) \neq y_i\}<br />
+\]<br />
+where \( \tilde{f}(x) = \mathbf{1}\{ f(x_i) > 1/2 \} \) is the &#8220;sign-rounding&#8221; of \( f \). Let \( x_i = i/2^n \) and \( y_i = m^{(n)}(x_i)\) where \(y = (0,1,0,1,\ldots) \). Notice that \( R(m^{(n)}) = 0 \). If a network \( g \) has \( \ell \) layers and width \( w < 2^{(n-k)/\ell-1} \), then \( R(g) > \frac{1}{2} &#8211; \frac{1}{3 \cdot 2^{k-1}} \).
+</div>
+<div class="proof">
+The right way to quantify the oscillatory quality of \( m^{(n)} \), for the purposes of this proof, is by how many affine pieces it has. We say a function \( f \) is \( t \)-sawtooth if it is piecewise affine with \( t \) pieces. Clearly \( m \) is \( 4 \)-sawtooth, and \( \sigma \) is \( 2 \)-sawtooth. Let&#8217;s first show a quick lemma:</p>
+<div class="lemma">
+If \(f\) is \(a\)-sawtooth and \(g\) is \(b\)-sawtooth, then \(f + g\) is at most \(a + b\)-sawtooth and \(f \circ g\) is at most \(ab\)-sawtooth.
+</div>
+<div class="proof">
+[of the Lemma] Addition is simple: the &#8220;joints&#8221; of \(f\) must fall within intervals on which \(g\) is affine, and adding an affine function does not change sawtooth degree. For composition, each interval on which \(f\) is affine has as its domain at most the range of \(g\), and therefore on this interval \(f(g)\) looks like (a subset of) \(ag + b\), which is \(b\)-sawtooth. Since there are \(a\) such intervals by assumption, \(f \circ g\) is \(ab\)-sawtooth.
+</div>
+<p>From this result it is clear that a depth-\(\ell\) and width-\(w\) ReLU network must produce an output that is at most \((2w)^\ell\)-sawtooth. If \(w < 2^{(n-k)/\ell-1}\) then the network computes a \(r \leq 2^{n-k}\)-sawtooth function, whereas \(m^{(n)}\) is precisely \(2^n\)-sawtooth. Now, let's examine each interval on which \(g\) is affine. If the interval contains \(p\) data points, then since \(g\) is affine on this interval it can have the correct sign for at most \(\frac{p+3}{2}\) of them. There are \(2^n\) data points overall, and if we partition them into the \(2^{n-k}\) intervals where \(g\) is constant, then \(g\) can have the correct sign for at most \(2^{n-1} + 3 \cdot 2^{n-k+1}\) of them. This means that \(R(g) > \frac{1}{2} &#8211; \frac{1}{3 \cdot 2^{k-1}} \)
+</div>
+<p>It is an instructive exercise to the reader to reproduce the example for the three-class, three-output extension (where the assigned class is taken to be the maximum of the three output values).</p>
+<h1> Depth Separation: Squared Loss </h1>
+<p>More generally we are interested to approximate a function \(f \colon [0,1]^d \to \mathbb{R}\) by a ReLU network \(\tilde{f}\) of depth \(\ell\) and width \(w\), where the output level is linear and we used the squared loss to evaluate network performance. The general theme is to find structural properties of \(f\) that make it hard to approximate by shallow networks &#8212; the theorem above was the first such result we&#8217;ll see, for a certain notion of oscillatory behavior for function in one dimension. Since deep nets are most used for high dimensional problems, it is interesting to try and classify how well do networks approximated such functions.</p>
+<h2> Quadratic Functions </h2>
+<p>Recalling that shallow nets cannot have too many saw-teeth, we first obtain a more general result for quadratic functions:</p>
+<div class="theorem">
+Let \(p(x) = p_2 x^2 + p_1 x + p_0\). If \(g\) is \(n\)-sawtooth then there is some constant \(C > 0\) such that<br />
+\[<br />
+\lVert p &#8211; g \rVert_2^2 \geq C p_2^2 / n^4<br />
+\]
+</div>
+<div class="remark">
+The decay looks bad, but in the end it is practically optimal. This should not discourage the reader, however, because what is important for our purposes is the relative rate of deep vs. shallow networks &#8212; this result says that shallow networks can get at best an \(n^4\) approximation rate, while deep networks can get about \(2^{4n}\).
+</div>
+<div class="proof">
+Since \(g\) is piecewise affine let&#8217;s look at the \(L^2\) error on each of its pieces separately. On each interval \([b, b+2a]\) the error looks like<br />
+\[<br />
+\int_b^{b+2a} \left| p_2 x^2 + p_1 x + p_0 &#8211; cx &#8211; d \right|^2 \, dx<br />
+\]<br />
+where \(g_{[b,b+2a]} = cx+d\). The trick is to alter the function \(g\) on each piece individually and look at the minimum error over all affine functions; adding these over all intervals will give the lower bound we want. The minimum of the above expression is<br />
+\[<br />
+\min_{c,d} \int_b^{b+2a} \left| p_2 x^2 &#8211; cx &#8211; d \right|^2 \, dx = \min_{c,d} \int_{-a}^{a} \left| p_2 x^2 &#8211; cx &#8211; d \right|^2 \, dx<br />
+\]<br />
+since translating does not change the top coefficient of a quadratic polynomial (and everything else has been absorbed into the minimum). Scaling the integration variable by \(a\) we get<br />
+\[<br />
+\min_{c,d} a\int_{-1}^{1} \left| p_2 a^2x^2 &#8211; cax &#8211; d \right|^2 \, dx<br />
+\]<br />
+and taking out the top coefficient (again absorbing everything else) yields<br />
+\[<br />
+\min_{c,d} a^5 p_2^2 \int_{-1}^{1} \left| x^2 &#8211; cx &#8211; d \right|^2 \, dx = C a^5 p_2^2<br />
+\]<br />
+Now let \(\{[a_i,b_i]\}\) be the intervals where \(g\) is affine, and let their lengths be denoted as \(\{\ell_i\}\). Then<br />
+\[<br />
+\lVert p &#8211; g \rVert_2^2 \geq \sum C p_2^2 \ell_i^5 \geq C \frac{p_2^2}{n^4}<br />
+\]<br />
+since \(1 \leq \sum \ell_i \leq \left( \sum \ell_i^5 \right)^{1/5} \left( \sum 1 \right)^{4/5}\) so \(1/n^4 \leq \sum \ell_i^5\) by Minkowski&#8217;s inequality.
+</div>
+<p>One nice interpretation of the above result is that the coefficient of the \(x^2\) term is the curvature of the function, so we&#8217;ve bounded the approximation capabilities of a neural network in terms of the curvature of the function being approximated.</p>
+<h2> Generalizing to Strongly Convex Functions </h2>
+<p>That result covers quadratic functions. Using the theory of orthogonal polynomials we can extend the result to the case of arbitrary degree polynomials, or analytic functions, or really any \( L^2 \) function. The Legendre polynomials are one such family, starting out as<br />
+\[<br />
+1, x, \frac{1}{2} \left( 3x^2 &#8211; 1 \right), \ldots<br />
+\]<br />
+This sequence can be generated in many different ways, but one simple way is to do Gram-Schmidt on the set \(\{1, x, x^2, x^3, \ldots\}\) (with the \(L^2([-1,1])\) inner product, with which we will be working for the foreseeable future). </p>
+<div class="remark">
+The theory of orthogonal polynomials is a rich one but for the theorem above it suffices to work with the Legendre polynomials. Another common family is the Hermite polynomials, defined among other ways as (the normalizations of)<br />
+\[<br />
+H_n(x) = (-1)^n e^{x^2} \frac{d^n}{dx^n} e^{-x^2}<br />
+\]<br />
+or<br />
+\[<br />
+H_{n+1}(x) = 2x H_n(x) &#8211; H_n'(x)<br />
+\]<br />
+starting at \(H_0 = 1\), or implicitly by<br />
+\[<br />
+e^{2xt &#8211; t^2} = \sum_{n=0}^\infty H_n(x) \frac{t^n}{n!}<br />
+\]<br />
+or as the function \(e^{x^2}\) multiplied by the solutions to the eigenvalue problem<br />
+\[<br />
+\mathcal{F} f = \lambda f<br />
+\]<br />
+where \(\mathcal{F}\) is the Fourier transform, or many more definitions. The Legendre polynomials satisfy similarly many interesting relations. The interested reader is encouraged to learn more about these families and their applications.
+</div>
+<p>Back to the topic at hand. Since the Legendre polynomials \(h_i\) are an orthonormal family, and \(\{h_0, \ldots, h_n\}\) spans exactly the space of polynomials of degree at most \(n\), the minimum from before becomes the length of an orthogonal projection onto the space of polynomials orthogonal to linear polynomials, and kills exactly the terms in an expansion corresponding to \(h_1\) and \(h_0\), the constant and linear terms. More precisely, if \(f = \sum a_i h_i\), then<br />
+\[<br />
+\min_{c, d} \int_{-1}^1 \left| f &#8211; cx &#8211; d \right|^2 = \sum_{i \geq 2} |a_i|^2 \geq |a_2|^2<br />
+\]<br />
+This gives the same curvature-type result as above, in an \(L^2\) sense. However we can relate this to more canonical properties of a function as follows. We say that a function \(f\) is \(\lambda\)-strongly convex (concave) in \(I\) if \(f&#8221;(x) \geq \lambda\) (\( \leq \lambda\)) throughout \(I\). This condition easily implies that \(f'(t) \geq f'(0) + \lambda t\) for \(t \geq 0\), and \(f'(t) \leq f'(0) + \lambda t\) for \(t \leq 0\). For any \(f\) we have<br />
+\[<br />
+a_2 = \langle f, h_2 \rangle \sim \int_{-1}^1 f(t) (3t^2 &#8211; 1) \, dt = &#8211; \int_{-1}^1 (t^3 &#8211; t) f'(t) \, dt<br />
+\]<br />
+and if \(f\) is \(\lambda\)-strongly convex this is<br />
+\[<br />
+&#8211; \int_0^1 (t &#8211; t^3) f'(t) \, dt + \int_{-1}^0 (t &#8211; t^3) f'(t) \, dt<br />
+\]<br />
+The first integral is at most \(\int_0^1 (t -t^3) (f'(0) + \lambda t) \, dt\), which by some elementary manipulation is at most \(C \lambda\). The other integral is treated identically. Therefore the \(L^2\) bound gives<br />
+\[<br />
+\lVert f &#8211; g \rVert^2 \geq C \frac{\lambda^2}{n^4}<br />
+\]</p>
+<p>What about higher dimensions? Let \(f \in \mathcal{C}^2([0,1]^d)\). If there is a unit vector \(v\) and a connected set \(U\) such that \(\langle v, H(f)(x) v \rangle \geq \lambda\) on \(U\), where by \(H_x(f)\) we mean the Hessian matrix, then projecting along \(v\) gives strong convexity, and integrating along these one-dimensional slices gives<br />
+\[<br />
+\lVert f &#8211; g \rVert \geq C \frac{\lambda^2}{n^4} \text{Vol}(U)<br />
+\]<br />
+There&#8217;s something a little unsatisfying about this condition, however, which is that in truly high dimensions we expect functions to be intrinsically more complex than in lower dimensions, and their approximation theory should scale accordingly. Neural networks excel at high-dimensional classification in practice, and this success is surely not limited to the type of one-dimensional phenomenon described above. However, let us keep in mind that while we think of the space of, say, \(1024 \times 1024\) images as a million-dimensional vector space, it really is just a space of functions operating on two dimensions: the dimensionality of a sampling of a scene, which is exactly what a camera does, is a different notion than the dimensionality of the space on which the true scene, as a function, operates. This should be contrasted with (say) the case of DNA, where the &#8220;true&#8221; space actually does have nearly a hundred thousand dimensions.</p>
+<h1> Other Depth Separation Results </h1>
+<p>The remainder of the lecture is an overview of a few results, with the ideas of proofs sketched or absent.</p>
+<h2> Circuits </h2>
+<p>One potential model for approximability of functions (which is not exactly a neural network) is a logical circuit, with function complexity measured in circuit complexity. The idea is that we have a bit string input (in \(\{0,1\}^n\)) as the &#8220;input layer&#8221;, and at each layer we can pass the bits from the previous layer through the unary NOT or binary AND or OR gates; we call such circuits Boolean. The very strong result we want to compare to is: </p>
+<div class="theorem">
+(<a href="https://arxiv.org/abs/1504.03398"> Rossman, Servedio, Tan </a>) For any fixed \(d\), there is a function \(f \colon \{0,1\}^n \to \{0,1\}\) computed by a linear circuit of depth \(d\) and size \(O(n)\) such that any depth-\(d-1\) circuit computing a function that agrees with \(f\) on a fraction \(1/2 + \delta\) of the possible inputs, for \(\delta > 0\), has size \(O(e^{n^{\Omega (1/d)}})\).
+</div>
+<p>This result follows a long line of work in theoretical computer science, in particular work by Hastad. We note, in comparison, that the separation results obtained by Telgarsky do not provide a depth separation between depth \( d \) and \( d &#8211; 1 \) like the result above.</p>
+<h2> Eldan-Shamir </h2>
+<p>As a step in this direction we will discuss a result of Eldan and Shamir showing separation between depths 2 and 3 for pretty general activation functions. More precisely, suppose \(\sigma\) satisfies<br />
+\[<br />
+|\sigma(x)| \leq C(1 + |x|^\alpha)<br />
+\]<br />
+for some \(C\) and \(\alpha\), and assume it is sufficiently expressive in the sense that for all Lipschitz \(f \colon \mathbb{R} \to \mathbb{R}\), constant outside \([-R, R]\), and \(\delta > 0\), there exist \(a, \alpha_i, \beta_i, \gamma_i\) such that<br />
+\[<br />
+\lVert f &#8211; a &#8211; \sum_i \alpha_i \sigma(\beta_i x &#8211; \gamma_i) \rVert_\infty < \delta
+\]
+
+<div class="theorem">
+(<a href="https://arxiv.org/pdf/1512.03965.pdf"> Eldan and Shamir </a>) There exists universal constants \(c, C\) with the following properties. For all \(d\) there exists a probability measure \(\mathbb{P}\) on \(\mathbb{R}^d\) and a function \(g \colon \mathbb{R}^d \to [-1,1]\) supported in \(B_{C \sqrt{d}}(0)\) expressible by a \(3\)-layer network with width \(\sim d^5\), such for any \(f\) expressible by a two-layer network with width \(c e^{c d}\) we must have<br />
+\[<br />
+\mathbb{E}\left[|f &#8211; g|^2\right] \geq c<br />
+\]
+</div>
+<p>Informally, there is a universal lower bound on the approximability of \(3\)-layer networks by \(2\)-layer networks.</p>
+<div class="proof">
+[Sketch] In the end the function \(g\) will be radial: \(g(x) = G(\lVert x \rVert^2)\). Equivalently, its Fourier transform will be radial. In any bounded domain \(x_i^2\) is Lipschitz so we can approximate it in one network layer by the expressivity assumption, therefore we can represent \(\lVert x \rVert^2\) in one layer as well (if we wanted to output this directly we would need another layer for summation, but since we&#8217;re using as input to the next layer this summation is build into the neuron inputs). The next layer will be used to compute \(g\). In Fourier space, choose \(\mu\) to have density \(|\phi|^2\), where \(\phi(\xi) = \mathcal{F}(\chi_{B_1(0)})(\xi)\). Clearly this is radial, and<br />
+\[<br />
+\mathbb{E}_\mu |f &#8211; g|^2 = \int |f &#8211; g|^2 |\phi|^2 \, dm = \lVert \widehat{f \phi} &#8211; \widehat{g \phi} \rVert_2^2<br />
+\]<br />
+Since \(f\) (the function we&#8217;re comparing \(g\) to) is two-layered, we have<br />
+\[<br />
+f(x) = \sum_i f_i(\langle v_i, x \rangle)<br />
+\]<br />
+where here \(f_i(x) = \sigma(x &#8211; \beta_i)\), but actually there&#8217;s enough freedom in the proof to choose different activations at each neuron in each layer provided they satisfy the properties assumed with uniform constants. By examining \(\widehat{f \phi}\) as a convolution, \(\widehat{f \phi}\) is supported in<br />
+\[<br />
+T = \cup \left(\text{span} (v_i) + B_1(0) \right)<br />
+\]<br />
+The essence is to design \(g\) such that exponentially many of these &#8220;tubes&#8221; are required to cover its support. Intuitively, we want \(\widehat{g \phi}\) to have a lot of mass away from the origin. The construction uses a randomized \(\tilde{g} = \sum_i c_i \epsilon_i g\), where \(g_i\) is radial and essentially \(\chi\{\lVert x \rVert \in \Delta_i\}\), \(\Delta_i\) is basically an interval of width \(1/N\) about \(1/d\), and \(\epsilon_i\) is Rademacher. Then \(\tilde{g} \phi \sim \sum c_i \epsilon_i g\) so \(\widehat{\tilde{g} \phi} \sim \sum \epsilon_i c_i \hat{g}_i\). It&#8217;s possible to show with not too much difficulty that \(\hat{g}_i\) has mass far away from the origin, but does \(\widehat{g \phi}\) (with some nonzero probability)? What about cancellations? Let \(P\) be the projection onto the part of the spectrum near the boundary of the ball. Then it turns out<br />
+\[<br />
+\mathbb{E}_\epsilon \left\lVert P \sum c_i \epsilon_i \hat{g}_i \right\rVert^2 = \sum_i \lVert P c_i \hat{g}_i \rVert^2<br />
+\]<br />
+which gives that there is indeed mass far from zero.
+</div>
+	</div><!-- .entry-content -->
+
+	<footer class="entry-footer">
+		<span class="byline"><span class="author vcard"><img alt='' src='http://2.gravatar.com/avatar/b149ee3c951d4c5946a62273f37709b6?s=49&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/b149ee3c951d4c5946a62273f37709b6?s=98&amp;d=mm&amp;r=g 2x' class='avatar avatar-49 photo' height='49' width='49' /><span class="screen-reader-text">Author </span> <a class="url fn n" href="http://elmos.scripts.mit.edu/mathofdeeplearning/author/elmos/">elmos</a></span></span><span class="posted-on"><span class="screen-reader-text">Posted on </span><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/09/mathematics-of-deep-learning-lecture-2/" rel="bookmark"><time class="entry-date published" datetime="2017-04-09T01:29:47+00:00">April 9, 2017</time><time class="updated" datetime="2017-06-21T21:14:07+00:00">June 21, 2017</time></a></span>			</footer><!-- .entry-footer -->
+</article><!-- #post-## -->
+
+	<nav class="navigation post-navigation" role="navigation">
+		<h2 class="screen-reader-text">Post navigation</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/03/09/mathematics-of-deep-learning-lecture-1/" rel="prev"><span class="meta-nav" aria-hidden="true">Previous</span> <span class="screen-reader-text">Previous post:</span> <span class="post-title">Mathematics of Deep Learning: Lecture 1- Introduction and the Universality of Depth 1 Nets</span></a></div><div class="nav-next"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/14/mathematics-of-deep-learning-lecture-3/" rel="next"><span class="meta-nav" aria-hidden="true">Next</span> <span class="screen-reader-text">Next post:</span> <span class="post-title">Mathematics of Deep Learning: Lecture 3 &#8211; More on depth separation.</span></a></div></div>
+	</nav>
+	</main><!-- .site-main -->
+
+	
+</div><!-- .content-area -->
+
+
+	<aside id="secondary" class="sidebar widget-area" role="complementary">
+		<section id="search-2" class="widget widget_search">
+<form role="search" method="get" class="search-form" action="http://elmos.scripts.mit.edu/mathofdeeplearning/">
+	<label>
+		<span class="screen-reader-text">Search for:</span>
+		<input type="search" class="search-field" placeholder="Search &hellip;" value="" name="s" />
+	</label>
+	<button type="submit" class="search-submit"><span class="screen-reader-text">Search</span></button>
+</form>
+</section>		<section id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widget-title">Recent Posts</h2>		<ul>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-8-hierarchical-generative-models-for-deep-learning/">Mathematics of Deep Learning: Lecture 8 &#8211; Hierarchical Generative Models for Deep Learning</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-7-recovering-tree-models/">Mathematics of Deep Learning: Lecture 7 &#8211; Recovering Tree Models</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/29/mathematics-of-deep-learning-lecture-6-simple-hierarchical-models/">Mathematics of Deep Learning: Lecture 6 &#8211; Simple hierarchical models</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/28/mathematics-of-deep-learning-lecture-5-random-sparse-nets-etc/">Mathematics of Deep Learning: Lecture 5 &#8211; Random Sparse Nets etc.</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/08/mathematics-of-deep-learning-lecture-4/">Mathematics of Deep Learning: Lecture 4 &#8211; PAC Learning and Deep Nets</a>
+						</li>
+				</ul>
+		</section>		<section id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widget-title">Recent Comments</h2><ul id="recentcomments"></ul></section><section id="archives-2" class="widget widget_archive"><h2 class="widget-title">Archives</h2>		<ul>
+			<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/'>July 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/'>May 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/'>April 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/03/'>March 2017</a></li>
+		</ul>
+		</section><section id="categories-2" class="widget widget_categories"><h2 class="widget-title">Categories</h2>		<ul>
+	<li class="cat-item cat-item-1"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/category/uncategorized/" >Uncategorized</a>
+</li>
+		</ul>
+</section><section id="meta-2" class="widget widget_meta"><h2 class="widget-title">Meta</h2>			<ul>
+						<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-login.php">Log in</a></li>
+			<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/feed/">Entries <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/comments/feed/">Comments <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="https://wordpress.org/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform.">WordPress.org</a></li>			</ul>
+			</section>	</aside><!-- .sidebar .widget-area -->
+
+		</div><!-- .site-content -->
+
+		<footer id="colophon" class="site-footer" role="contentinfo">
+			
+			
+			<div class="site-info">
+								<span class="site-title"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/" rel="home">Mathematical Aspects of Deep Learning</a></span>
+				<a href="https://wordpress.org/">Proudly powered by WordPress</a>
+			</div><!-- .site-info -->
+		</footer><!-- .site-footer -->
+	</div><!-- .site-inner -->
+</div><!-- .site -->
+
+	<div style="display:none">
+	<div class="grofile-hash-map-b149ee3c951d4c5946a62273f37709b6">
+	</div>
+	</div>
+<script type='text/javascript' src='http://s0.wp.com/wp-content/js/devicepx-jetpack.js?ver=201727'></script>
+<script type='text/javascript' src='http://s.gravatar.com/js/gprofiles.js?ver=2017Julaa'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/modules/wpgroho.js?ver=4.5.2'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/skip-link-focus-fix.js?ver=20160412'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var screenReaderText = {"expand":"expand child menu","collapse":"collapse child menu"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/functions.js?ver=20160412'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/wp-embed.min.js?ver=4.5.2'></script>
+<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=default&#038;ver=1.3.6'></script>
+<script type='text/javascript' src='http://stats.wp.com/e-201727.js' async defer></script>
+<script type='text/javascript'>
+	_stq = window._stq || [];
+	_stq.push([ 'view', {v:'ext',j:'1:4.4.2',blog:'122429706',post:'94',tz:'0',srv:'elmos.scripts.mit.edu'} ]);
+	_stq.push([ 'clickTrackerInit', '122429706', '94' ]);
+</script>
+</body>
+</html>

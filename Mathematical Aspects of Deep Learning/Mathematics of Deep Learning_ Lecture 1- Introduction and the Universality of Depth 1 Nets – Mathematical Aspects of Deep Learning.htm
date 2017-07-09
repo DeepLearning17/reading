@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en-US" class="no-js">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="profile" href="http://gmpg.org/xfn/11">
+		<script>(function(html){html.className = html.className.replace(/\bno-js\b/,'js')})(document.documentElement);</script>
+<title>Mathematics of Deep Learning: Lecture 1- Introduction and the Universality of Depth 1 Nets &#8211; Mathematical Aspects of Deep Learning</title>
+<link rel="alternate" type="application/rss+xml" title="Mathematical Aspects of Deep Learning &raquo; Feed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Mathematical Aspects of Deep Learning &raquo; Comments Feed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/comments/feed/" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/elmos.scripts.mit.edu\/mathofdeeplearning\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.5.2"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;if(!g||!g.fillText)return!1;switch(g.textBaseline="top",g.font="600 32px Arial",a){case"flag":return g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3;case"diversity":return g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,d=c[0]+","+c[1]+","+c[2]+","+c[3],g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e;case"simple":return g.fillText(h(55357,56835),0,0),0!==g.getImageData(16,16,1,1).data[0];case"unicode8":return g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0]}return!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i;for(i=Array("simple","flag","unicode8","diversity"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='twentysixteen-jetpack-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/modules/theme-tools/compat/twentysixteen.css?ver=4.4.2' type='text/css' media='all' />
+<link rel='stylesheet' id='twentysixteen-fonts-css'  href='https://fonts.googleapis.com/css?family=Merriweather%3A400%2C700%2C900%2C400italic%2C700italic%2C900italic%7CMontserrat%3A400%2C700%7CInconsolata%3A400&#038;subset=latin%2Clatin-ext' type='text/css' media='all' />
+<link rel='stylesheet' id='genericons-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/_inc/genericons/genericons/genericons.css?ver=3.1' type='text/css' media='all' />
+<link rel='stylesheet' id='twentysixteen-style-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/style.css?ver=4.5.2' type='text/css' media='all' />
+<!--[if lt IE 10]>
+<link rel='stylesheet' id='twentysixteen-ie-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 9]>
+<link rel='stylesheet' id='twentysixteen-ie8-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie8.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 8]>
+<link rel='stylesheet' id='twentysixteen-ie7-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie7.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<link rel='stylesheet' id='jetpack_css-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/css/jetpack.css?ver=4.4.2' type='text/css' media='all' />
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/jquery/jquery.js?ver=1.12.3'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.0'></script>
+<!--[if lt IE 9]>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/html5.js?ver=3.7.3'></script>
+<![endif]-->
+<link rel='https://api.w.org/' href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://elmos.scripts.mit.edu/mathofdeeplearning/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/wlwmanifest.xml" /> 
+<link rel='next' title='Mathematics of Deep Learning: Lecture 2 &#8211; Depth Separation.' href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/09/mathematics-of-deep-learning-lecture-2/' />
+<meta name="generator" content="WordPress 4.5.2" />
+<link rel="canonical" href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/03/09/mathematics-of-deep-learning-lecture-1/" />
+<link rel='shortlink' href='http://wp.me/p8hHyG-q' />
+<link rel="alternate" type="application/json+oembed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/oembed/1.0/embed?url=http%3A%2F%2Felmos.scripts.mit.edu%2Fmathofdeeplearning%2F2017%2F03%2F09%2Fmathematics-of-deep-learning-lecture-1%2F" />
+<link rel="alternate" type="text/xml+oembed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/oembed/1.0/embed?url=http%3A%2F%2Felmos.scripts.mit.edu%2Fmathofdeeplearning%2F2017%2F03%2F09%2Fmathematics-of-deep-learning-lecture-1%2F&#038;format=xml" />
+
+<link rel='dns-prefetch' href='//v0.wordpress.com'>
+<style type='text/css'>img#wpstats{display:none}</style>		<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+		
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Mathematics of Deep Learning: Lecture 1- Introduction and the Universality of Depth 1 Nets" />
+<meta property="og:url" content="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/03/09/mathematics-of-deep-learning-lecture-1/" />
+<meta property="og:description" content="MathJax.Hub.Config({ TeX: { equationNumbers: { autoNumber: &#8220;AMS&#8221; } } }); Transcribed by Joshua Pfeffer (edited by Asad Lodhia, Elchanan Mossel and Matthew Brennan) Introduction: A Non-R…" />
+<meta property="article:published_time" content="2017-03-09T01:39:20+00:00" />
+<meta property="article:modified_time" content="2017-06-15T23:51:01+00:00" />
+<meta property="og:site_name" content="Mathematical Aspects of Deep Learning" />
+<meta property="og:image" content="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/03/grid-lec1.png" />
+<meta property="og:image:width" content="238" />
+<meta property="og:image:height" content="238" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary" />
+
+<style id="custom-css-css">body{counter-reset:h2counter}h1{counter-reset:h2counter}h2:before{content:counter(h2counter) ".";counter-increment:h2counter;counter-reset:h3counter}h3:before{content:counter(h2counter) "." counter(h3counter) ".";counter-increment:h3counter}.theorem{display:block;margin:12px 0;font-style:italic}.theorem:before{content:"Theorem.";font-weight:700;font-style:normal}.claim{display:block;margin:12px 0;font-style:italic}.claim:before{content:"Claim.";font-weight:700;font-style:normal}.proposition{display:block;margin:12px 0;font-style:italic}.proposition:before{content:"Proposition.";font-weight:700;font-style:normal}.lemma{display:block;margin:12px 0;font-style:italic}.lemma:before{content:"Lemma.";font-weight:700;font-style:normal}.proof{display:block;margin:12px 0;font-style:normal}.proof:before{content:"Proof.";font-style:italic}.proof:after{content:"\25FC";float:right}.definition{display:block;margin:12px 0;font-style:normal}.definition:before{content:"Definition.";font-weight:700;font-style:normal}.remark{display:block;margin:12px 0;font-style:normal}.remark:before{content:"Remark.";font-weight:700;font-style:normal}</style>
+</head>
+
+<body class="single single-post postid-26 single-format-standard">
+<div id="page" class="site">
+	<div class="site-inner">
+		<a class="skip-link screen-reader-text" href="#content">Skip to content</a>
+
+		<header id="masthead" class="site-header" role="banner">
+			<div class="site-header-main">
+				<div class="site-branding">
+					
+											<p class="site-title"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/" rel="home">Mathematical Aspects of Deep Learning</a></p>
+									</div><!-- .site-branding -->
+
+							</div><!-- .site-header-main -->
+
+					</header><!-- .site-header -->
+
+		<div id="content" class="site-content">
+
+<div id="primary" class="content-area">
+	<main id="main" class="site-main" role="main">
+		
+<article id="post-26" class="post-26 post type-post status-publish format-standard hentry category-uncategorized">
+	<header class="entry-header">
+		<h1 class="entry-title">Mathematics of Deep Learning: Lecture 1- Introduction and the Universality of Depth 1 Nets</h1>	</header><!-- .entry-header -->
+
+	
+	
+	<div class="entry-content">
+		<p><script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: { equationNumbers: { autoNumber: "AMS" } }
+});
+</script></p>
+
+<p><em>Transcribed by Joshua Pfeffer (edited by Asad Lodhia, Elchanan Mossel and Matthew Brennan) </em></p>
+<h1> Introduction: A Non-Rigorous Review of Deep Learning </h1>
+<p>For most of today&#8217;s lecture, we present a non-rigorous review of deep learning; our treatment follows the recent book <em> Deep Learning </em> by Goodfellow, Bengio and Courville.</p>
+<p>We begin with the model we study the most, the &#8220;quintessential deep learning model&#8221;: the deep forward network (Chapter 6 of GBC).</p>
+<h2> Deep forward networks </h2>
+<p>When doing statistics, we begin with a &#8220;nature&#8221;, or function \(f\); the data is given by \(\left\langle X_i, f(X_i) \right\rangle\), where \(X_i\) is typically high-dimensional and \(f(X_i)\) is in \(\{0,1\}\) or \(\mathbb{R}\). The goal is to find a function \(f^*\) that is close to \(f\) using the given data, hopefully so that you can make accurate predictions.</p>
+<p>In deep learning, which is by-and-large a subset of parametric statistics, we have a family of functions<br />
+\[<br />
+f(X;\theta)<br />
+\]<br />
+where \(X\) is the <em> input </em> and \(\theta\) the <em> parameter </em> (which is typically high-dimensional). The goal is to find a \(\theta^*\) such that \(f(X;\theta^*)\) is close to \(f\).</p>
+<p>In our context, \(\theta\) is the <em> network </em>. The network is a composition of \(d\) functions<br />
+\[<br />
+f^{(d)}( \cdot, \theta) \circ \cdots \circ f^{(1)}( \cdot, \theta),<br />
+\]<br />
+most of which will be high-dimensional.  We can represent the network with the diagram</p>
+<p><center><br />
+<img src="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/03/tree-lec1-296x300.png" alt="tree-lec1" width="296" height="300" class="alignnone size-medium wp-image-75" srcset="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/03/tree-lec1-296x300.png 296w, http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/03/tree-lec1.png 313w" sizes="(max-width: 296px) 85vw, 296px" /><br />
+</center></p>
+<p>where \(h_1^{(i)},\ldots,h_n^{(i)}\) are the components of the vector-valued function \(f^{(i)}\)&#8212;also called the \(i\)-th <em> layer </em> of the network&#8212;and each \(h_j^{(i)}\) is a function of \((h_1^{(i-1)},\ldots,h_n^{(i-1)})\).  In the diagram above, the number of components of each \(f^{(i)}\)&#8212;which we call the <em> width </em> of layer \(i\)&#8212;is the same, but in general, the width may vary from layer to layer.  We call \(d\) the <em> depth </em> of the network. Importantly, the \(d\)-th layer is different from the preceding layers; in particular, its width is \(1\), <em> i.e. </em>, \(f = f^{(d)}\) is scalar-valued.</p>
+<p>Now, what statisticians like the most are linear functions.  But, if we were to stipulate that the functions \(f^{(i)}\) in our network should be linear, then the composed function \(f\) would be linear as well, eliminating the need for multiple layers altogether.  Thus, we want the functions \(f^{(i)}\) to be non-linear.<br />
+A common design is motivated by a model from neuroscience, in which a cell receives multiple signals  and its synapse either doesn&#8217;t fire or fires with a certain intensity depending on the input signals. With the inputs represented by \(x_1,\ldots,x_n \in \mathbb{R}_{+}\), the output in the model is given by<br />
+\[<br />
+f(x) = g\left( \sum a_i x_i + c \right)<br />
+\]<br />
+for some non-linear function \(g\). Motivated by this example, we define<br />
+\[<br />
+h^{(i)} = g^{\otimes}\left( {W^{(i)}}^T x + b^{(i)} \right),<br />
+\]<br />
+where \(g^{\otimes}\) denotes the coordinate-wise application of some non-linear function \(g\).  </p>
+<p>Which \(g\) to choose? Generally, people want \(g\) to be the &#8220;least non-linear&#8221; function possible&#8212;hence the common use of the RELU (Rectified Linear Units) function \(g(z) = \text{max}(0,z)\).  Other choices of \(g\) (motivated by neuroscience and statistics) include the logistic function \[ g(z) = \frac{1}{1 + e^{-2\beta z}} \] and the hyperbolic tangent \[ g(z) = \tanh(z) = \frac{e^z &#8211; e^{-z}}{e^z + e^{-z}}.\]  These functions have the advantage of being bounded (unlike the RELU function).</p>
+<p>As noted earlier, the top layer has a different form from the preceding ones.  First, it is usually-scalar valued. Second, it usually has some statistical interpretation: \(h_1^{(d-1)},\ldots,h_n^{(d-1)}\) are often viewed as parameters of a classical statistical model, informing our choice of \(g\) in the top layer. One example of such a choice is the linear function \(y = W^T h + b\), motivated by thinking of the output as the conditional mean of a Gaussian. Another example is  \(\sigma(w^T h + b)\), where \(\sigma\) is the sigmoid function \(x \mapsto \frac{1}{1+e^x}\); this choice is motivated by thinking of the output as a probability of a Bernoulli trial with probability \(P(y)\) proportional to \(\exp(yz)\), where \(z = w^T h + b\). More generally, the soft-max is given by<br />
+\[<br />
+\text{softmax}(z)_i = \frac{\exp(z_i)}{\sum_j \exp(z_j)}<br />
+\]<br />
+where \(z = W^T h +b\).  Here, the components of \(z\) may correspond to the possible values of the output, with \(\text{softmax}(z)_i\) the probability of value \(i\).  (We may consider, for example, a network with input a photograph, and interpret the output \((\text{softmax}(z)_1,\text{softmax}(z)_2,\text{softmax}(z)_1)\) as the probabilities that the photograph depicts a cat, dog, or frog.)</p>
+<p>In the next few weeks, we will address the questions: 1) How well can such functions approximate general functions? 2) What is the expressive power of depth and width?</p>
+<h2> Convolution Networks </h2>
+<p><em> Convolution networks </em>, described in Chapter 9 of GBC, are networks with <em> linear operators </em>, namely, localized convolution operators using some underlying grid geometry.  For example, consider the network whose \(k\)-th layer can be represented by the \(m \times m\) grid</p>
+<p><center><br />
+<img src="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/03/grid-lec1.png" alt="grid-lec1" width="238" height="238" class="alignnone size-full wp-image-73" srcset="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/03/grid-lec1.png 238w, http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/uploads/2017/03/grid-lec1-150x150.png 150w" sizes="(max-width: 238px) 85vw, 238px" /><br />
+</center></p>
+<p>We then define the function \(h^{(k+1)}_{i,j}\) in layer \(k+1\) by <em> convolving </em> over a \(2 \times 2\) square in the layer below, and then applying the non-linear function \(g\):<br />
+\[<br />
+h_{i,j}^{(k+1)} = g\left( a^{(k)} h_{i,j}^{(k)} + b^{(k)} h_{i+1,j}^{(k)} + c^{(k)} h_{i,j+1}^{(k)} + d^{(k)} h_{i+1,j+1}^{(k)} \right)<br />
+\]<br />
+The parameters \(a^{(k)}, b^{(k)}, c^{(k)},\) and \(d^{(k)}\) depend only on the layer, not on the particular square \(i,j\). (This restriction is not necessary from the general definition, but is a reasonable restriction in applications such as vision.) In addition to the advantage of parameter sharing, this type of network has the useful feature  of sparsity resulting from the local nature of the definition of the functions \(h\).</p>
+<p>A common additional ingredient in convolutional networks is pooling, in which, after convolving and applying \(g\) to obtain the grid-indexed functions \(h_{i,j} ^{(k+1)}\), we replace these function with the average or maximum of the functions in a neighborhood; for example, setting<br />
+\[<br />
+\overline{h}_{i,j}^{(k+1)} = \frac{1}{4} \left( h_{i,j}^{(k+1)} + h_{i+1,j}^{(k+1)} + h_{i,j+1}^{(k+1)} + h_{i+1,j+1}^{(k+1)} \right).<br />
+\]<br />
+This technique can also be used to reduce dimension.</p>
+<h2> Models and Optimization </h2>
+<p>The next question we address is, how do we find the parameters for our networks, <em> i.e. </em>, which \(\theta\) do we take? Also, what criteria should we use to evaluate which \(\theta\) are better than others?  For this, we usually use statistical modeling. The net \(\theta\) determines a probability distribution \(P(\theta)\); often, we will want to maximize \(P_{\theta}(y|x)\).  Equivalently, we will want to minimize \[ J(\theta) = &#8211; \mathbb{E} \log P_{\theta}(y|x),\] where the expectation is taken over the data (log likelihood).  For example, if we model \(y\) as a Gaussian with mean \(f(x;\theta)\) and covariance matrix the identity, then we want to minimize the mean error cost \[ J(\theta) = \mathbb{E}\left[ \left\| y &#8211; f(x;\theta) \right\|^2 \right] \] A second example to consider: \(y\) sampled according to the Bernoulli distribution with probability exponential in \(w^T h + b\), where \(h\) is the last layer; in other words, \(P(y)\) is logistic with parameter \(z = w^T h + b\). </p>
+<p>How do you optimize \(J\) both accurately and efficiently? We will not discuss this issue in detail in this course since so far there is not much theory on this question (though such knowledge could land you a lucrative job in the tech sector). What makes this optimization hard is that 1) dimensions are high, 2) the data set is large, 3) \(J\) is non-convex, and 4) there are too many parameters (overfitting). Faced with this task, a natural approach is to do what Newton would do: <em> gradient descent </em>.  A slightly more efficient way to do gradient descent (for us, yielding an improvement by a factor of the size of the network) is <em> back-propagation </em>, a method that involves clever bookkeeping of partial derivatives by dynamic programming.  </p>
+<p>Another technique that we will not discuss (but would help you find remunerative employment in Silicon Valley) is <em> regularization </em>. Regularization addresses the problem of overfitting, an issue summed up well by the quote, due to John Von Neumann, that &#8220;with four parameters I can fit an elephant and with five I can make him wiggle his trunk.&#8221;  The characterization of five parameters as too many might be laughable today, but the problem of overfitting is as real today as ever! Convolution networks provide one solution to the problem of overfitting through parameter sharing. Regularization offers another solution: instead of optimizing \(J(\theta)\), we optimize over \[ \tilde{J}(\theta) = J(\theta) + \Omega(\theta),\] where \(\Omega\) is a &#8220;measure of complexity&#8221;.  Essentially, \(\Omega\) introduces a penalty for &#8220;complicated&#8221; or &#8220;large&#8221; parameters.  Some example of \(\Omega\) include the \(L_2\) or \(L_1\) (preferred to \(L_0\) for convexity reasons).  In the context of deep learning, there are other ways of addressing the problem of overfitting. One is <em> data augmentation </em>, in which the data is used to generate more data; for example, from a given photo, more photos can be generated by rotating the photo or adding shade (A rotated dog is still a dog!). Another is <em> noising</em>, in which noise is added either to the data (for example, by taking a photo and blacking it out) or to the parameters.</p>
+<h2> Generative Models &#8212; Deep Boltzmann Machines </h2>
+<p>There are a number of probabilistic models that are used in deep learning.  The first one we describe is an example of a <em> graphical model </em>. Graphical models are families of distributions that are parametrized by graphs, possibly with parameters on the edges.  Since deep nets are graphs with parameters on the edges, it is natural to see whether we can express it as a graphical model.  A <em> Deep Boltzmann machine </em> is a graphical model whose joint distribution is given by the exponential expression<br />
+\[<br />
+P(v,h^{(1)},\ldots,h^{(d)}) = \frac{1}{Z(\theta)} \exp\left( E(v,h^{(1)},\ldots,h^{(d)}) \right),<br />
+\]<br />
+where the energy \(E\) of a configuration is given by<br />
+\[<br />
+E(v,h^{(1)},\ldots,h^{(d)}) = \sum {h^{(i)}}^T W^{(i+1)} h^{(i+1)} + v^T W^{(1)} h^{(1)}.<br />
+\]<br />
+Typically, internal layers are real-valued vectors; the top and bottom layers are either discrete or real-valued.</p>
+<p>What does this look like as a graph&#8212;what is the graphical model here? It is a particular type of bipartite graph, in which the vertices corresponding to each layer is connected only to the layer immediately above it and to the layer immediately below it.</p>
+<p>The Markov property says that, for instance, conditional on \(h_1\), the distribution of a component of \(v\) is independent of both \(h_2,\ldots,h_d\) and the other components of \(v\). If \(v\) is discrete,<br />
+\[<br />
+P[v_i=1| h^{(1)} ] = \sigma( W_{i,*}^{(1)} h^{(1)}),<br />
+\]<br />
+and similarly for other conditioning.</p>
+<p>Unfortunately, we don&#8217;t know how to sample from or optimize in graphical models in general, which limits their usefulness in the deep learning context. </p>
+<h2> Deep Belief Networks </h2>
+<p><em> Deep belief networks </em> are computationally simpler, though a bit more annoying to define.  These &#8220;hybrid&#8221; networks are essentially a directed graphical model with \(d\) layers, except the top two layers are not directed: \(P(h^{(d-1)},h^{(d)})\) is given by<br />
+\begin{equation}<br />
+P(h^{(d-1)},h^{(d)}) = Z^{-1} \exp\left( {b^{(d)}}^T h^{(d)} + {b^{(d-1)}}^T h^{(d-1)} + {h^{(d-1)}}^T W^{(d)} h^{(d)} \right)<br />
+\label{star}<br />
+\end{equation}<br />
+For the other layers,<br />
+\begin{equation}<br />
+P( h^{(k)} | h^{(k+1)}) = \sigma^{\otimes}\left(b^{(k)} + {W^{(k+1)}}^T h^{(k+1)}\right).<br />
+\label{starr}<br />
+\end{equation}<br />
+Note that we are going in the opposite direction that we were before. However, we have the following fact: if \(h^{(k)}, h^{(k+1)} \in \{0,1\}^n\) are defined by (\ref{star}), then they satisfy (\ref{starr}).</p>
+<p> Note that we know how to sample the bottom layers conditional on layers directly from  above; but for inference we also need  the <em> conditional </em> distribution of the output <em> given </em> the input.</p>
+<p>Finally, we emphasize that, while the \(k\)-th layer in the deep Boltzmann machine depends on layers \(k+1\) and \(k-1\), in deep belief, if we condition only on layer \(k+1\), we can accurately generate the \(k\)-th layer (not conditional on other layers).</p>
+<h2> Plan for the Course </h2>
+<p>In this class, the main topics we plan to discuss are</p>
+<ul>
+<li> the expressive power of depth, </li>
+<li> computational issues, and </li>
+<li> simple analyzable generative models. </li>
+</ul>
+<p>The first topic addresses the descriptive power of networks: what functions can be approximated by networks?  The papers we plan to discuss are</p>
+<ul>
+<li> &#8220;Approximations by superpositions of sigmoidal functions&#8221; by Cybenko (89). </li>
+<li> &#8220;Approximation capabilities of multilayer feedforward networks&#8221; by Hornik (91). </li>
+<li> &#8220;Representation Benefits of Deep Forward Networks&#8221; by Telgarsky (15). </li>
+<li> &#8220;Depth Separation in Relu Networks&#8221; by Safran and Shamir (16) </li>
+<li> &#8220;On the Expressive Power of Deep Learning: A Tensor Analysis&#8221; by Cohen, Or, Shashua (15). </li>
+</ul>
+<p>The first two papers, which we will start to describe later in this lecture, prove that &#8220;you can express everything with a single layer&#8221; (If you were planning to drop this course, a good time to do so would be after we cover those two papers!). The subsequent papers, however, show that this single layer would have to be very wide, in a sense we will make precise later.</p>
+<p>Regarding the second topic, hardness results we discuss in this course will likely include</p>
+<ul>
+<li>
+&#8220;On the computational efficiency of training Neural Networks&#8221; by Livni, Shalev Schwartz and Shamir (14).
+</li>
+<li>
+&#8220;Complexity Theory Limitation for learning DNFs&#8221; by Danieli<br />
+and Shalev-Schwartz (16).
+</li>
+<li>
+&#8220;Distribution Specific Hardness of learning Neural Networks&#8221; by Shamir (16).
+</li>
+</ul>
+<p>On the algorithmic side:</p>
+<ul>
+<li> &#8220;Guaranteed Training of Neural Networks using Tensor Methods&#8221; by Janzamin, Sedghi and Anandkumar (16). </li>
+<li> &#8220;Train faster, generalize better&#8221; by Hardt, Recht and Singer. </li>
+</ul>
+<p>Finally, papers on generative models that we will read will include</p>
+<ul>
+<li>
+&#8220;Provable Bounds for Learning Some Deep Representations&#8221; by Arora et. al (2014).
+</li>
+<li>
+&#8220;Deep Learning and Generative Hierarchal models&#8221; by Mossel (2016).
+</li>
+</ul>
+<p>Again, today we will begin to study the first two papers on the first topic&#8212;the papers by Cybenko and Hornik.</p>
+<h1> The Theorems of Cybenko and Hornik </h1>
+<p>In his 1989 paper, Cybenko proved the following result.</p>
+<div class="theorem">
+[Cybenko (89)] Let \(\sigma\) be a continuous monotone function with \(\lim_{t \rightarrow &#8211; \infty} \sigma(t) = 0\) and \(\lim_{t \rightarrow + \infty} \sigma(t) = 1\).  (For example, we may let \(\sigma\) be the sigmoid function \(\sigma(t) = \frac{1}{1 + e^{-t}}\).) Then, the set of functions of the form \(f(x) = \sum \alpha_j \sigma(w_j^T x + b_j)\) is dense in \(C_n([0,1])\).
+</div>
+<p>In the above theorem, \(C_n([0,1]) = C([0,1]^n)\) is the space of continuous functions from \([0,1]^n\) to \([0,1]\) with the metric \(d(f,g) = \sup|f(x)-g(x)|\). </p>
+<p>Hornik proved the following generalization of Cybenko&#8217;s result.</p>
+<div class="theorem"> [Hornik (91)]<br />
+Consider the set of functions defined in the previous theorem,  but with no conditions placed yet on \(\sigma\).</p>
+<ul>
+<li> If \(\sigma\) is bounded and non-constant, then the set is dense in \(L^p(\mu)\), where \(\mu\) is any finite measure on \(\mathbb{R}^k\). </li>
+<li> If \(\sigma\) is additionally continuous, then the set is dense in \(C(X)\), the space of all continuous functions on \(X\) ,where \(X \subset \mathbb{R}^k\) is compact. </li>
+<li> If, additionally, \(\sigma \in C^m(\mathbb{R}^k)\), then the set is dense in \(C^m(\mathbb{R}^k)\) and also in \(C^{m,p}(\mu)\) for every finite \(\mu\) with compact support. </li>
+<li> If, additionally, \(\sigma\) has bounded derivatives up the order \(m\), then the set is dense in \(C^{m,p}(\mu)\) for every finite measure \(\mu\) on \(\mathbb{R}^k\). </li>
+</ul>
+</div>
+<p>In the above Theorem, the space \(L^p(\mu)\) is the space of functions \(f\) with \(\int |f|^p d\mu < \infty\) with metric \(d(f,g) = \left( \int |f-g|^p d\mu \right)^{1/p}\).
+
+To begin the proof, we need a crash course in functional analysis.  
+
+
+<div class="theorem"> [Hahn-Banach Extension Theorem]<br />
+If \(V\) is a normed vector space with linear subspace \(U\) and \(z \in V \backslash \overline{U}\), then there exists a continuous linear map \(L: V \rightarrow K\) with \(L(x) = 0\) for all \(x \in U\), \(L(z) = 1\), and \(\left\|L\right\| \leq d(U,z)\).
+</div>
+<p>Why is this theorem useful in our context? Our proof of Cybenko and Hornik&#8217;s results is a proof by contradiction using the Hahn-Banach extension theorem. We consider the subspace \(U\) given by \(\{ \sum \alpha_j \sigma(w_j^T x + b_j)\}\), and we assume for contradiction that \(\overline{U}\) is not the entire space of functions.  We conclude that there exists a continuous linear map \(L\) on our function space that restricts to \(0\) on \(\overline{U}\) but is not identically zero. In other words, to prove the desired result, it suffices to show that any continuous linear map \(L\) that is zero on \(U\) must be the zero map.</p>
+<p>Now, classical results in Functional analysis state that a continuous linear functional \(L\) on \(L^p(\mu)\) can be expressed as<br />
+\[<br />
+L(f) = \int f g \,d\mu<br />
+\]<br />
+for some \(g \in L^q(\mu)\), where \(\frac{1}{p} + \frac{1}{q} = 1\).  A continuous linear functional \(L\) on \(C(X)\) can be expressed as<br />
+\[<br />
+L(f) = \int f \,d\mu(x),<br />
+\]<br />
+where \(\mu\) is a finite signed measure supported on \(X\).<br />
+We can find similar expressions for linear functionals on the other spaces considered in the theorems of Cybenko and Hornik.</p>
+<p>Before going into the general proof, consider the (easy) example in which our function space is \(L^p(\mu)\) and \(\sigma(x) = \mathbf{1}(x \geq 0)\). How do I show that, if \(L(f) = 0\) for all \(f\) in the set defined in the theorem, then the function \(g \in L^q(\mu)\) associated to \(L\) must be identically zero? By translation, we obtain from \(\sigma\) the indicator of any interval, <em> i.e.</em>, we can show that \(\int_a^b g d\mu =0\) for any \(a < b\).  Since \(\mu\) is finite (\(\sigma\)-finiteness is enough here), \(g\) must be zero, as desired.
+
+Using this example as inspiration, we now consider the general case in the setting of Cybenko's theorem. We want to show that
+\[
+\int_{\mathbb{R}^k} \sigma(w^t x + b) d\mu(x) = 0 \forall w,b
+\]
+implies that \(\mu = 0\).  First, we reduce to dimension \(1\) using the following Fourier analysis trick: defining the measures \(\mu_a\) as \[ \mu_a(B) = \mu(x: a^t x \in B),\] we observe that \[ \int_R \sigma(w^t x + b) d\mu_a(x) = 0 \] Moreover, if we can show that \(\mu_a \equiv 0\) for each \(a\), then \(\mu \equiv 0\) (``a measure is defined by all of its projections''), since then
+\[
+\hat{\mu}(a) = \int_{\mathbb{R}^k} \exp(i a^t x) d\mu(x) = \int_{\mathbb{R}} \exp(it) d\mu_a(t) = 0 \Rightarrow \hat{\mu} =0 \Rightarrow \mu = 0.
+\]
+(Note that we used the finiteness of \(\mu\) here.)
+
+Having reduced to dimension \(1\), we employ another very useful trick (that also uses the finiteness of \(\mu\))---the convolution trick.  By convolving \(\mu\) with a small Gaussian, we obtain a measure that has a density, letting us work with Lebesgue measure.
+
+We now sketch the remainder of the proof.  By our convolution trick, we have \begin{equation} \int_{\mathbb{R}^k} \sigma(w^t x + b) h(x) dx = 0 \quad \forall w,b \label{con} \end{equation} and want to show that the density \(h = 0\).  Changing variables, we rewrite the condition (\ref{con}) as
+\[
+\int_{\mathbb{R}} \sigma(t) h(wt+b) dt = 0 \quad \forall w \neq 0,b
+\]
+To show that \(h=0\), we use the following tool from abstract Fourier analysis.  Let \(I\) be the closure of the linear space spanned by all the \(h(wt+b)\).  Since \(I\) is invariant under shifting our functions, it follows that it is invariant under convolution; in the language of abstract Fourier analysis, \(I\) is an <em> ideal </em> with respect to convolution.  Let \(Z(I)\) denote the set of all \(\omega\) at which the Fourier transform of all functions on \(I\) vanish; then \(Z(I)\) is either \(\mathbb{R}\) or \(\{0\}\) since if \(g(t)\) is in the ideal then so is \(g(t w)\) for \(w \neq 0\). If \(Z(I) = \mathbb{R}\) then all the functions in the ideal are constant \(0\) as needed. Otherwise, \(Z(I) = \{0\}\), then, by Fourier analysis, \(I\) is the set of all functions with \(\hat{f}(0) = 0\); i.e, all non-constant functions. But if \(\sigma\) is orthogonal to all non-constant functions, then it follows that \(\sigma = 0\). We conclude that \(Z(I) = \mathbb{R}\), <em> i.e. </em>, \(h = 0\), completing the proof.</p>
+	</div><!-- .entry-content -->
+
+	<footer class="entry-footer">
+		<span class="byline"><span class="author vcard"><img alt='' src='http://2.gravatar.com/avatar/b149ee3c951d4c5946a62273f37709b6?s=49&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/b149ee3c951d4c5946a62273f37709b6?s=98&amp;d=mm&amp;r=g 2x' class='avatar avatar-49 photo' height='49' width='49' /><span class="screen-reader-text">Author </span> <a class="url fn n" href="http://elmos.scripts.mit.edu/mathofdeeplearning/author/elmos/">elmos</a></span></span><span class="posted-on"><span class="screen-reader-text">Posted on </span><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/03/09/mathematics-of-deep-learning-lecture-1/" rel="bookmark"><time class="entry-date published" datetime="2017-03-09T01:39:20+00:00">March 9, 2017</time><time class="updated" datetime="2017-06-15T23:51:01+00:00">June 15, 2017</time></a></span>			</footer><!-- .entry-footer -->
+</article><!-- #post-## -->
+
+	<nav class="navigation post-navigation" role="navigation">
+		<h2 class="screen-reader-text">Post navigation</h2>
+		<div class="nav-links"><div class="nav-next"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/09/mathematics-of-deep-learning-lecture-2/" rel="next"><span class="meta-nav" aria-hidden="true">Next</span> <span class="screen-reader-text">Next post:</span> <span class="post-title">Mathematics of Deep Learning: Lecture 2 &#8211; Depth Separation.</span></a></div></div>
+	</nav>
+	</main><!-- .site-main -->
+
+	
+</div><!-- .content-area -->
+
+
+	<aside id="secondary" class="sidebar widget-area" role="complementary">
+		<section id="search-2" class="widget widget_search">
+<form role="search" method="get" class="search-form" action="http://elmos.scripts.mit.edu/mathofdeeplearning/">
+	<label>
+		<span class="screen-reader-text">Search for:</span>
+		<input type="search" class="search-field" placeholder="Search &hellip;" value="" name="s" />
+	</label>
+	<button type="submit" class="search-submit"><span class="screen-reader-text">Search</span></button>
+</form>
+</section>		<section id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widget-title">Recent Posts</h2>		<ul>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-8-hierarchical-generative-models-for-deep-learning/">Mathematics of Deep Learning: Lecture 8 &#8211; Hierarchical Generative Models for Deep Learning</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-7-recovering-tree-models/">Mathematics of Deep Learning: Lecture 7 &#8211; Recovering Tree Models</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/29/mathematics-of-deep-learning-lecture-6-simple-hierarchical-models/">Mathematics of Deep Learning: Lecture 6 &#8211; Simple hierarchical models</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/28/mathematics-of-deep-learning-lecture-5-random-sparse-nets-etc/">Mathematics of Deep Learning: Lecture 5 &#8211; Random Sparse Nets etc.</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/08/mathematics-of-deep-learning-lecture-4/">Mathematics of Deep Learning: Lecture 4 &#8211; PAC Learning and Deep Nets</a>
+						</li>
+				</ul>
+		</section>		<section id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widget-title">Recent Comments</h2><ul id="recentcomments"></ul></section><section id="archives-2" class="widget widget_archive"><h2 class="widget-title">Archives</h2>		<ul>
+			<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/'>July 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/'>May 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/'>April 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/03/'>March 2017</a></li>
+		</ul>
+		</section><section id="categories-2" class="widget widget_categories"><h2 class="widget-title">Categories</h2>		<ul>
+	<li class="cat-item cat-item-1"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/category/uncategorized/" >Uncategorized</a>
+</li>
+		</ul>
+</section><section id="meta-2" class="widget widget_meta"><h2 class="widget-title">Meta</h2>			<ul>
+						<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-login.php">Log in</a></li>
+			<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/feed/">Entries <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/comments/feed/">Comments <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="https://wordpress.org/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform.">WordPress.org</a></li>			</ul>
+			</section>	</aside><!-- .sidebar .widget-area -->
+
+		</div><!-- .site-content -->
+
+		<footer id="colophon" class="site-footer" role="contentinfo">
+			
+			
+			<div class="site-info">
+								<span class="site-title"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/" rel="home">Mathematical Aspects of Deep Learning</a></span>
+				<a href="https://wordpress.org/">Proudly powered by WordPress</a>
+			</div><!-- .site-info -->
+		</footer><!-- .site-footer -->
+	</div><!-- .site-inner -->
+</div><!-- .site -->
+
+	<div style="display:none">
+	<div class="grofile-hash-map-b149ee3c951d4c5946a62273f37709b6">
+	</div>
+	</div>
+<script type='text/javascript' src='http://s0.wp.com/wp-content/js/devicepx-jetpack.js?ver=201727'></script>
+<script type='text/javascript' src='http://s.gravatar.com/js/gprofiles.js?ver=2017Julaa'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/modules/wpgroho.js?ver=4.5.2'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/skip-link-focus-fix.js?ver=20160412'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var screenReaderText = {"expand":"expand child menu","collapse":"collapse child menu"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/functions.js?ver=20160412'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/wp-embed.min.js?ver=4.5.2'></script>
+<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=default&#038;ver=1.3.6'></script>
+<script type='text/javascript' src='http://stats.wp.com/e-201727.js' async defer></script>
+<script type='text/javascript'>
+	_stq = window._stq || [];
+	_stq.push([ 'view', {v:'ext',j:'1:4.4.2',blog:'122429706',post:'26',tz:'0',srv:'elmos.scripts.mit.edu'} ]);
+	_stq.push([ 'clickTrackerInit', '122429706', '26' ]);
+</script>
+</body>
+</html>

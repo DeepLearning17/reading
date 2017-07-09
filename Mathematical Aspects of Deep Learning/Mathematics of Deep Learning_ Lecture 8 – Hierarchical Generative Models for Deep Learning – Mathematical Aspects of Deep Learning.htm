@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en-US" class="no-js">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="profile" href="http://gmpg.org/xfn/11">
+		<script>(function(html){html.className = html.className.replace(/\bno-js\b/,'js')})(document.documentElement);</script>
+<title>Mathematics of Deep Learning: Lecture 8 &#8211; Hierarchical Generative Models for Deep Learning &#8211; Mathematical Aspects of Deep Learning</title>
+<link rel="alternate" type="application/rss+xml" title="Mathematical Aspects of Deep Learning &raquo; Feed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Mathematical Aspects of Deep Learning &raquo; Comments Feed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/comments/feed/" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/elmos.scripts.mit.edu\/mathofdeeplearning\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.5.2"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;if(!g||!g.fillText)return!1;switch(g.textBaseline="top",g.font="600 32px Arial",a){case"flag":return g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3;case"diversity":return g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,d=c[0]+","+c[1]+","+c[2]+","+c[3],g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e;case"simple":return g.fillText(h(55357,56835),0,0),0!==g.getImageData(16,16,1,1).data[0];case"unicode8":return g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0]}return!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i;for(i=Array("simple","flag","unicode8","diversity"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='twentysixteen-jetpack-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/modules/theme-tools/compat/twentysixteen.css?ver=4.4.2' type='text/css' media='all' />
+<link rel='stylesheet' id='twentysixteen-fonts-css'  href='https://fonts.googleapis.com/css?family=Merriweather%3A400%2C700%2C900%2C400italic%2C700italic%2C900italic%7CMontserrat%3A400%2C700%7CInconsolata%3A400&#038;subset=latin%2Clatin-ext' type='text/css' media='all' />
+<link rel='stylesheet' id='genericons-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/_inc/genericons/genericons/genericons.css?ver=3.1' type='text/css' media='all' />
+<link rel='stylesheet' id='twentysixteen-style-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/style.css?ver=4.5.2' type='text/css' media='all' />
+<!--[if lt IE 10]>
+<link rel='stylesheet' id='twentysixteen-ie-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 9]>
+<link rel='stylesheet' id='twentysixteen-ie8-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie8.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 8]>
+<link rel='stylesheet' id='twentysixteen-ie7-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie7.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<link rel='stylesheet' id='jetpack_css-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/css/jetpack.css?ver=4.4.2' type='text/css' media='all' />
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/jquery/jquery.js?ver=1.12.3'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.0'></script>
+<!--[if lt IE 9]>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/html5.js?ver=3.7.3'></script>
+<![endif]-->
+<link rel='https://api.w.org/' href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://elmos.scripts.mit.edu/mathofdeeplearning/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='Mathematics of Deep Learning: Lecture 7 &#8211; Recovering Tree Models' href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-7-recovering-tree-models/' />
+<meta name="generator" content="WordPress 4.5.2" />
+<link rel="canonical" href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-8-hierarchical-generative-models-for-deep-learning/" />
+<link rel='shortlink' href='http://wp.me/p8hHyG-2X' />
+<link rel="alternate" type="application/json+oembed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/oembed/1.0/embed?url=http%3A%2F%2Felmos.scripts.mit.edu%2Fmathofdeeplearning%2F2017%2F07%2F06%2Fmathematics-of-deep-learning-lecture-8-hierarchical-generative-models-for-deep-learning%2F" />
+<link rel="alternate" type="text/xml+oembed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/oembed/1.0/embed?url=http%3A%2F%2Felmos.scripts.mit.edu%2Fmathofdeeplearning%2F2017%2F07%2F06%2Fmathematics-of-deep-learning-lecture-8-hierarchical-generative-models-for-deep-learning%2F&#038;format=xml" />
+
+<link rel='dns-prefetch' href='//v0.wordpress.com'>
+<style type='text/css'>img#wpstats{display:none}</style>		<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+		
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Mathematics of Deep Learning: Lecture 8 &#8211; Hierarchical Generative Models for Deep Learning" />
+<meta property="og:url" content="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-8-hierarchical-generative-models-for-deep-learning/" />
+<meta property="og:description" content="MathJax.Hub.Config({ TeX: { equationNumbers: { autoNumber: &#8220;AMS&#8221; }, extensions: [&#8220;AMSmath.js&#8221;]} }); Transcribed by Frederic Koehler (edited by Asad Lodhia, Elchanan Mossel a…" />
+<meta property="article:published_time" content="2017-07-06T17:04:14+00:00" />
+<meta property="article:modified_time" content="2017-07-06T17:04:14+00:00" />
+<meta property="og:site_name" content="Mathematical Aspects of Deep Learning" />
+<meta property="og:image" content="https://s0.wp.com/i/blank.jpg" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary" />
+
+<style id="custom-css-css">body{counter-reset:h2counter}h1{counter-reset:h2counter}h2:before{content:counter(h2counter) ".";counter-increment:h2counter;counter-reset:h3counter}h3:before{content:counter(h2counter) "." counter(h3counter) ".";counter-increment:h3counter}.theorem{display:block;margin:12px 0;font-style:italic}.theorem:before{content:"Theorem.";font-weight:700;font-style:normal}.claim{display:block;margin:12px 0;font-style:italic}.claim:before{content:"Claim.";font-weight:700;font-style:normal}.proposition{display:block;margin:12px 0;font-style:italic}.proposition:before{content:"Proposition.";font-weight:700;font-style:normal}.lemma{display:block;margin:12px 0;font-style:italic}.lemma:before{content:"Lemma.";font-weight:700;font-style:normal}.proof{display:block;margin:12px 0;font-style:normal}.proof:before{content:"Proof.";font-style:italic}.proof:after{content:"\25FC";float:right}.definition{display:block;margin:12px 0;font-style:normal}.definition:before{content:"Definition.";font-weight:700;font-style:normal}.remark{display:block;margin:12px 0;font-style:normal}.remark:before{content:"Remark.";font-weight:700;font-style:normal}</style>
+</head>
+
+<body class="single single-post postid-183 single-format-standard">
+<div id="page" class="site">
+	<div class="site-inner">
+		<a class="skip-link screen-reader-text" href="#content">Skip to content</a>
+
+		<header id="masthead" class="site-header" role="banner">
+			<div class="site-header-main">
+				<div class="site-branding">
+					
+											<p class="site-title"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/" rel="home">Mathematical Aspects of Deep Learning</a></p>
+									</div><!-- .site-branding -->
+
+							</div><!-- .site-header-main -->
+
+					</header><!-- .site-header -->
+
+		<div id="content" class="site-content">
+
+<div id="primary" class="content-area">
+	<main id="main" class="site-main" role="main">
+		
+<article id="post-183" class="post-183 post type-post status-publish format-standard hentry category-uncategorized">
+	<header class="entry-header">
+		<h1 class="entry-title">Mathematics of Deep Learning: Lecture 8 &#8211; Hierarchical Generative Models for Deep Learning</h1>	</header><!-- .entry-header -->
+
+	
+	
+	<div class="entry-content">
+		<p><script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: { equationNumbers: { autoNumber: "AMS" }, extensions: ["AMSmath.js"]}
+});
+</script></p>
+
+<p><em> Transcribed by Frederic Koehler (edited by Asad Lodhia, Elchanan Mossel and Matthew Brennan) </em></p>
+<p>Today we will study a model interpolating between tree reconstruction (introduced last time) and deep learning (topic of this class).</p>
+<p> Recall the model last time: we have a broadcasting process on a tree \(T\) with root \(r\) and \(\ell\) levels, where \(k\) samples, each of the form \(\{\sigma'(v)\}_{v \in \text{Nodes}(T)}\) are generated by the following process:</p>
+<ol>
+<li> Sample \(\sigma'(r)\) for the root \(r\) uniformly from \([q] = \{1, \ldots, q\}\).
+<li> Given \(\sigma'(w)\) and \(v\) is a child of \(w\), then with probability \(\theta\) set \(\sigma'(v) = \sigma'(w)\) and with probability \(1 &#8211; \theta\) draw \(\sigma'(v)\) from the uniform distribution on \([q]\).
+</ol>
+<p>We let \(\sigma(v)\) be the \(k\)-tuple of the \(k\) i.i.d. samples of \(\sigma'(v)\). Last time we discussed how you can reconstruct the structure of \(T\) given \(\{\sigma(v)\}_{v \in \text{Leaves}(T)}\).</p>
+<h1> A Model Between Tree Reconstruction and Deep Learning </h1>
+<p>We will now introduce two models that build on one another and interpolate between tree reconstruction and deep learning.</p>
+<h2> First Step: Semi-supervised Learning Model </h2>
+<p>The first step in our interpolation is to convert the problem into one of semi-supervised learning. We attach to each vertex \(v\) in the graph a set of labels \(L(v)\), with the constraint that is \(v\) is above \(w\) then \(L(v) \subset L(w)\), i.e. we only accumulate labels as we go down the tree. Furthermore we require that if \(a \in L(v_1) \cap L(v_2)\) then the lowest common ancestor \(v\) of \(v_1\) and \(v_2\) satisfies \(a \in L(v)\).</p>
+<p> The motivation for this comes from evolution: we should think that the labels consist of tags like “Dog” and “German Shepherd” (in which case the \(\sigma(v)\) at the leaves model the genetic data of each species), and the rules give that every descendant of a dog is a dog and that every two dogs most common ancestor was also a dog.</p>
+<p> Now that we have labels we can consider the following semi-supervised learning task: the data is \(\{\sigma(v)\}_{v \in Level(\ell)}\) and \(\{(\sigma(v), L(v)) : v \in S\}\) for some subset \(S\) of the leaves (\(Level(\ell)\)). Our task is to infer \(L(v)\) for all \(v \in Level(\ell)\). Roughly speaking this models the problem that we have the genetic code for many animals, some of which are labeled by tags such as “Dog” and “Cat” etc. and now we want to infer for all of the unlabelled animals whether they are a dog or cat as well.</p>
+<h2> Second Step: Adding Nonlinearity </h2>
+<p> Now we move on to the second step: we want to introduce nonlinear functions of multiple variables (like the sigmoid composed with linear map in the neurons of a neural network). We modify the way \(\sigma(v)\) is generated given its parent \(\sigma(w)\):</p>
+<ol>
+<li> For \(i = 1, \ldots, k\), let \(\tilde{\sigma}(v)_i\) be \(\sigma(w)_i\) with probability \(\theta\) and uniform at random from \([q]\) with probability \(1 &#8211; \theta\).
+<li> Define \[(\sigma(v)_{2i &#8211; 1}, \sigma(v)_{2i}) := \Pi_{(w, v)} \left(\tilde{\sigma}(v)_{\Sigma_{|v|}(2i &#8211; 1)}, \tilde{\sigma}(v)_{\Sigma_{|v|}(2i)}\right)\] where \(\Pi_{(w,v)} : [q]^2 \to [q]^2 \) is a function depending only on \(w\) and \(v\), and \(\Sigma_{|v|}\) is a permutation on \([k]\) depending only on the level of \(v\). (Note in particular that neither of these depend on \(i\)).
+</ol>
+<p>Thus the variable \(\sigma_{i}(v)\) is a function of noisy copies of two different entries of \(\sigma(w)\). The ability to choose \(\Sigma\) gives us freedom in which of these two entries they are, for example \(\sigma_i\) could depend on one of positions \(i\) and \(i + 2^r\) in its parent and this roughly models the way convolutional neural networks mix across different length scales in each layer.</p>
+<p> Also note that applying just one \(\Pi \in S_{q^2}\) is already interesting; i.e. how can we recover the root from the leaves in a known tree? For example if \(\Pi\) is drawn uniformly at random, and only at the last layer, and \(k = 1\) then by symmetry \(\sigma(r)\) is independent from the values of \(\sigma\) at the leaves which is markedly different from the situation without \(\Pi\).</p>
+<p> Roughly the analogy to a standard neural network is as follows: \(\Sigma\) represents the connections of neurons, \(\Pi\) is the nonlinear activation composed with a linear function and the noise is a “nuisance variable” that makes objects different (instead of them just being copies of each other). For example when \(\Sigma = Id, \Pi = Id\) and there is no noise, the network is just copying. We can also visualize a sort of “deep net” of a leaf where we look at the interchanges of the variables (given by \(\Sigma\)) between \(\sigma\) on the path from the root to the leaf.</p>
+<h1> Learning with a Deep Algorithm </h1>
+<p>We now move on to discussing learning tasks.</p>
+<h2> The Semi-supervised Learning Task </h2>
+<p>Formally our goal is to solve the semi-supervised learning problem explained above. Practically, in order to solve this problem we will try to learn hidden variables \(\Sigma_{|v|}\), \(\Pi_{w,v}\) and \(\sigma(v)\) (for \(v\) non-leaves) as well as the tree structure, and then use all of this information to determine labels. We begin with an easy claim.</p>
+<div class="claim">
+To identify the labels of the leaves in \(Level(\ell) \setminus S\) correctly, then it must hold that for every \(a\) that appears in the leaves, there exists some \(u, v \in S\) such that \(a \in L(u) \cap L(v)\) and \(MCA(\{\text{Leaves labeled by } a\}) = MCA(\{u,v\})\) where \(MCA\) denotes the most common ancestor. We refer to this as a <i> good labeling </i>.
+</div>
+<p>For example, if we only have one labelled example of a tiger there is no way to infer that some unlabeled examples are tigers, since there is no way to even figure out if the direct parent of the labeled example is also labeled as a tiger.</p>
+<div class="proof">
+Observe that this is true even if we are given the tree, and being given the tree \(\sigma\) tells us nothing about the label assignments e.g. the label assignments and \(\sigma\) could have been both generated independently at random.</p>
+<p> On the other hand, if the tree is known and we have a good labeling then it is obvious that we can infer all of the correct labels: first propagate the labels up the tree from \(S\) using the good labeling condition, then propagate this information down to the leaves (since labels are hereditary).
+</p></div>
+<h2> Recovering the Tree </h2>
+<p>What remains to discuss is the problem of recovering the tree. We will not attempt to use the labels for this task, so this part is an unsupervised learning task.</p>
+<p> First we assume \(\Sigma\) is known. We consider the task of learning siblings.</p>
+<p> <b> Learning Siblings: </b> First we consider how to test whether \(u,v\) are siblings with parent \(w\) given that \(\Pi_{w,u} = \Pi_{w,v} = Id\). Suppose this is the case, then if we let \[X := \# \{ i \in [k] : \sigma(v)_i = \sigma(u)_i \}\] we observe that there is a \(\theta^2\) chance of a given coordinate being “copied” from \(v\) to \(u\) and otherwise a \(1/q\) chance of the coordinate being the same, thus \[\mathbb{E}[X] = k \theta^2 + \frac{k(1 &#8211; \theta^2)}{q}\] and by the Chernoff bound this is very concentrated (sub-Gaussian with variance proxy of order \(k\)). Moreover if \(w\) and \(v\) are not siblings then the expectation is smaller, i.e. the first term is at least as bad as \(k \theta^4\) so for sufficiently large \(k\) we can distinguish these two cases with high probability.</p>
+<p> In general, we can do this test by enumerating over all possible \(\Pi_{w,u}\) and \(\Pi_{w,v}\): if \(w\) and \(v\) are not siblings, then with high probability we will never observe a small \(X\), whereas if they are then when we choose the right permutations we will observe a small \(X\) with high probability.</p>
+<div class="remark">
+Note that it is actually impossible to recover \(\Pi_{w,v}\) and \(\Pi_{w,u}\). If we take some permutation \(\pi\) and replace \(\Pi_{w,v}\) with \(\Pi_{w,v} \circ \pi\) and \(\Pi_{w,u}\) with \(\Pi_{w,u} \circ \pi\) then these new permutations will be equally good for the purposes of our statistical test above, and in fact if we make this change for a whole level we can see that the distribution of the generated data is identical, so the permutations \(\Pi\) are undeterdetermined. A technical argument can be used to show that this is the only degree of freedom for the \(\Pi\) and so we can recover up to this degree of freedom.
+</div>
+<p> <b> Recursive Algorithm: </b> Now that we can learn siblings, we can recurse similarly to the case of tree reconstruction. Thus we can recover the tree and under the condition of a good labeling we can perform semi-supervised learning with \(k = \theta(\ell)\).</p>
+<p> We end by noting that if \(S\) is very large then there are other ways to learn labels without reconstructing the tree; e.g. if \(S\) consists of all but a few labels, then we can learn labels of unlabeled leaves just by finding their nearest-neighbor among the elements of \(S\).</p>
+<h1> Lower Bounds </h1>
+<p>Note that in the above result we used a recursive (“deep”) algorithm. This leads us to this natural question: can we show that simpler algorithms don’t perform as well?</p>
+<h2> Local Algorithms </h2>
+<p>First we will show that local algorithms require a suboptimal number of samples. The definition of a local algorithm is that when it labels \(w \notin S\), it uses only \(\{(\sigma(v), L(v)) : v \in S\}\) and \(\sigma(w)\); it does not use any of the other unlabelled data.</p>
+<p> We choose the following input distribution over labels: Fix an integer \(h\) and \(h_0 < h\). There are no labels for the first \(h_0 - 1\) levels. At level \(h_0\), we label each vertex distinctly, in a random order. For each vertex \(v\) at level \(h_0\), we pick its leftmost and rightmost descendant (i.e. leftmost leaf of the overall tree under \(v\) and righmost leaf of the tree under \(v\)) and add these two vertices to \(S\).
+
+
+<div class="theorem">
+The probability that a local algorithm labels a random leaf correctly is less than \(d^{-h_0}(1 + O(k \theta^{h &#8211; h_0}))\).
+</div>
+<div class="remark">
+Note that it is trivial to achieve \(d^{-h_0}\) by guessing randomly. As a consequence, to get better than random even when \(h_0 = 1\) we need \(k \theta^{h &#8211; 1} = \Omega(1)\) so we need \(k = \Omega(\theta^{-(h &#8211; 1)}) = \Omega(|T|^{\beta})\) for some constant \(\beta\) depending on \(\theta\). In comparison the “deep” algorithm we described before needs only \(k = \Omega(h) = \Omega(\log |T|)\).
+</div>
+<div class="proof">
+[Sketch] The little cheat we make is that if \(w\) is in the same tree with labeled leaves \(v_1, v_2\) then we assume \(MCA(w,v_1) = MCA(w, v_2) = MCA(v_1, v_2)\) (It is in fact true that most \(v_1,v_2\) are far apart, which is a general and easy to prove fact about trees that we can use to make the following argument rigorous).</p>
+<p> Now the proof “trick” is to give the algorithm extra information, \((Label(v), \sigma(v))\) for each vertex \(v\) at level \(h_0\). Given this extra information, \(\sigma(w)\) is independent of \(\{\sigma(v) : v \in S\}\) by the Markov property (since removing the vertices at level \(h_0\) leaves \(w\) in a connected component by itself, relying on the “cheat” described above). We also make the algorithm&#8217;s life “easy” by setting \(\Pi = Id\) and \(\Sigma = Id\).</p>
+<p> Now we have reduced the problem to a pure hypothesis testing question. Let \(H_i\) be the hypothesis that \(w\) is labelled by \(i\), i.e. \(w\) is a child of \(v_i\) where \(v_i\) is the vertex at level \(h_0\) labeled by \(i\). Note that the distribution of \(w\) given the true \(v_i\) is that of a noisy copy with parameter \(\theta^{h &#8211; h_0}\). Thus with probability at least \(1 &#8211; k \theta^{h &#8211; h_0}\) all of the coordinates of \(w\) have been resampled from the uniform distribution. By a coupling argument, it follows that any hypothesis test labels correctly with probability at most \[(1 &#8211; k\theta^{h &#8211; h_0}) (1/d) + k \theta^{h &#8211; h_0} \le (1/d) + k\theta^{h &#8211; h_0}.\]
+</p></div>
+<h2> Shallow Algorithms </h2>
+<p>Next we want to show that certain shallow algorithms also cannot recover as well as the “deep” algorithm we presented first. Formally, we define a shallow algorithm to be one that is given access only the following data:</p>
+<ol>
+<li> For each label \(a\) and each position \(i\) is given \[c_i(a,x) = \#\{\text{leaves $\nu$ in $S$ labelled by $a$ such that $\sigma(v)_i = x$}\}\]
+<li> all unlabeled data
+</ol>
+<p>In other words, we have summarized the labeled data by count statistics and do not let the algorithm look at higher order moments of the labelled data.</p>
+<p> We consider the family of input instances where the direct children of the root are labeled \(1, \ldots, d\) and in each of their subtrees, every leaf is labeled except the rightmost child. Then we have the following theorem:</p>
+<div class="theorem">
+If \(d \theta^2 < 1\), a shallow algorithm requires \(k \ge (1/\theta)^c \ge \Omega(|T|^{c'})\) samples in order to label correctly with probability greater than \(2/d\). This is true even if \(\Sigma = Id\) and \(\Pi = Id\).
+</div>
+<p>We do not present the whole proof of the theorem but just observe that it follows from known lower bounds on count reconstruction.</p>
+<p> Finally we present an open problem: The lower bounds should be much better when \(\Pi\) are random and the \(\Sigma_j\) mix different elements. More specifically, the bound for shallow algorithms should hold if \(\theta = 1 &#8211; c^h\) for some \(c< 1\) ‘for some \(c < 1\), instead of requiring \(\theta < 1/\sqrt{d}\) when \(\Pi\) are random and \(\Sigma\) “mixes” well (e.g. \(\Sigma_r(x) = x + 2^r\)).
+</p>
+	</div><!-- .entry-content -->
+
+	<footer class="entry-footer">
+		<span class="byline"><span class="author vcard"><img alt='' src='http://2.gravatar.com/avatar/b149ee3c951d4c5946a62273f37709b6?s=49&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/b149ee3c951d4c5946a62273f37709b6?s=98&amp;d=mm&amp;r=g 2x' class='avatar avatar-49 photo' height='49' width='49' /><span class="screen-reader-text">Author </span> <a class="url fn n" href="http://elmos.scripts.mit.edu/mathofdeeplearning/author/elmos/">elmos</a></span></span><span class="posted-on"><span class="screen-reader-text">Posted on </span><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-8-hierarchical-generative-models-for-deep-learning/" rel="bookmark"><time class="entry-date published updated" datetime="2017-07-06T17:04:14+00:00">July 6, 2017</time></a></span>			</footer><!-- .entry-footer -->
+</article><!-- #post-## -->
+
+	<nav class="navigation post-navigation" role="navigation">
+		<h2 class="screen-reader-text">Post navigation</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-7-recovering-tree-models/" rel="prev"><span class="meta-nav" aria-hidden="true">Previous</span> <span class="screen-reader-text">Previous post:</span> <span class="post-title">Mathematics of Deep Learning: Lecture 7 &#8211; Recovering Tree Models</span></a></div></div>
+	</nav>
+	</main><!-- .site-main -->
+
+	
+</div><!-- .content-area -->
+
+
+	<aside id="secondary" class="sidebar widget-area" role="complementary">
+		<section id="search-2" class="widget widget_search">
+<form role="search" method="get" class="search-form" action="http://elmos.scripts.mit.edu/mathofdeeplearning/">
+	<label>
+		<span class="screen-reader-text">Search for:</span>
+		<input type="search" class="search-field" placeholder="Search &hellip;" value="" name="s" />
+	</label>
+	<button type="submit" class="search-submit"><span class="screen-reader-text">Search</span></button>
+</form>
+</section>		<section id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widget-title">Recent Posts</h2>		<ul>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-8-hierarchical-generative-models-for-deep-learning/">Mathematics of Deep Learning: Lecture 8 &#8211; Hierarchical Generative Models for Deep Learning</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-7-recovering-tree-models/">Mathematics of Deep Learning: Lecture 7 &#8211; Recovering Tree Models</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/29/mathematics-of-deep-learning-lecture-6-simple-hierarchical-models/">Mathematics of Deep Learning: Lecture 6 &#8211; Simple hierarchical models</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/28/mathematics-of-deep-learning-lecture-5-random-sparse-nets-etc/">Mathematics of Deep Learning: Lecture 5 &#8211; Random Sparse Nets etc.</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/08/mathematics-of-deep-learning-lecture-4/">Mathematics of Deep Learning: Lecture 4 &#8211; PAC Learning and Deep Nets</a>
+						</li>
+				</ul>
+		</section>		<section id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widget-title">Recent Comments</h2><ul id="recentcomments"></ul></section><section id="archives-2" class="widget widget_archive"><h2 class="widget-title">Archives</h2>		<ul>
+			<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/'>July 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/'>May 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/'>April 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/03/'>March 2017</a></li>
+		</ul>
+		</section><section id="categories-2" class="widget widget_categories"><h2 class="widget-title">Categories</h2>		<ul>
+	<li class="cat-item cat-item-1"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/category/uncategorized/" >Uncategorized</a>
+</li>
+		</ul>
+</section><section id="meta-2" class="widget widget_meta"><h2 class="widget-title">Meta</h2>			<ul>
+						<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-login.php">Log in</a></li>
+			<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/feed/">Entries <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/comments/feed/">Comments <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="https://wordpress.org/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform.">WordPress.org</a></li>			</ul>
+			</section>	</aside><!-- .sidebar .widget-area -->
+
+		</div><!-- .site-content -->
+
+		<footer id="colophon" class="site-footer" role="contentinfo">
+			
+			
+			<div class="site-info">
+								<span class="site-title"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/" rel="home">Mathematical Aspects of Deep Learning</a></span>
+				<a href="https://wordpress.org/">Proudly powered by WordPress</a>
+			</div><!-- .site-info -->
+		</footer><!-- .site-footer -->
+	</div><!-- .site-inner -->
+</div><!-- .site -->
+
+	<div style="display:none">
+	<div class="grofile-hash-map-b149ee3c951d4c5946a62273f37709b6">
+	</div>
+	</div>
+<script type='text/javascript' src='http://s0.wp.com/wp-content/js/devicepx-jetpack.js?ver=201727'></script>
+<script type='text/javascript' src='http://s.gravatar.com/js/gprofiles.js?ver=2017Julaa'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/modules/wpgroho.js?ver=4.5.2'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/skip-link-focus-fix.js?ver=20160412'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var screenReaderText = {"expand":"expand child menu","collapse":"collapse child menu"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/functions.js?ver=20160412'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/wp-embed.min.js?ver=4.5.2'></script>
+<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=default&#038;ver=1.3.6'></script>
+<script type='text/javascript' src='http://stats.wp.com/e-201727.js' async defer></script>
+<script type='text/javascript'>
+	_stq = window._stq || [];
+	_stq.push([ 'view', {v:'ext',j:'1:4.4.2',blog:'122429706',post:'183',tz:'0',srv:'elmos.scripts.mit.edu'} ]);
+	_stq.push([ 'clickTrackerInit', '122429706', '183' ]);
+</script>
+</body>
+</html>
