@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en-US" class="no-js">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="profile" href="http://gmpg.org/xfn/11">
+		<script>(function(html){html.className = html.className.replace(/\bno-js\b/,'js')})(document.documentElement);</script>
+<title>Mathematics of Deep Learning: Lecture 3 &#8211; More on depth separation. &#8211; Mathematical Aspects of Deep Learning</title>
+<link rel="alternate" type="application/rss+xml" title="Mathematical Aspects of Deep Learning &raquo; Feed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Mathematical Aspects of Deep Learning &raquo; Comments Feed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/comments/feed/" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/elmos.scripts.mit.edu\/mathofdeeplearning\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.5.2"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;if(!g||!g.fillText)return!1;switch(g.textBaseline="top",g.font="600 32px Arial",a){case"flag":return g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3;case"diversity":return g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,d=c[0]+","+c[1]+","+c[2]+","+c[3],g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e;case"simple":return g.fillText(h(55357,56835),0,0),0!==g.getImageData(16,16,1,1).data[0];case"unicode8":return g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0]}return!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i;for(i=Array("simple","flag","unicode8","diversity"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='twentysixteen-jetpack-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/modules/theme-tools/compat/twentysixteen.css?ver=4.4.2' type='text/css' media='all' />
+<link rel='stylesheet' id='twentysixteen-fonts-css'  href='https://fonts.googleapis.com/css?family=Merriweather%3A400%2C700%2C900%2C400italic%2C700italic%2C900italic%7CMontserrat%3A400%2C700%7CInconsolata%3A400&#038;subset=latin%2Clatin-ext' type='text/css' media='all' />
+<link rel='stylesheet' id='genericons-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/_inc/genericons/genericons/genericons.css?ver=3.1' type='text/css' media='all' />
+<link rel='stylesheet' id='twentysixteen-style-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/style.css?ver=4.5.2' type='text/css' media='all' />
+<!--[if lt IE 10]>
+<link rel='stylesheet' id='twentysixteen-ie-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 9]>
+<link rel='stylesheet' id='twentysixteen-ie8-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie8.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 8]>
+<link rel='stylesheet' id='twentysixteen-ie7-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie7.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<link rel='stylesheet' id='jetpack_css-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/css/jetpack.css?ver=4.4.2' type='text/css' media='all' />
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/jquery/jquery.js?ver=1.12.3'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.0'></script>
+<!--[if lt IE 9]>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/html5.js?ver=3.7.3'></script>
+<![endif]-->
+<link rel='https://api.w.org/' href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://elmos.scripts.mit.edu/mathofdeeplearning/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='Mathematics of Deep Learning: Lecture 2 &#8211; Depth Separation.' href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/09/mathematics-of-deep-learning-lecture-2/' />
+<link rel='next' title='Mathematics of Deep Learning: Lecture 4 &#8211; PAC Learning and Deep Nets' href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/08/mathematics-of-deep-learning-lecture-4/' />
+<meta name="generator" content="WordPress 4.5.2" />
+<link rel="canonical" href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/14/mathematics-of-deep-learning-lecture-3/" />
+<link rel='shortlink' href='http://wp.me/p8hHyG-1Z' />
+<link rel="alternate" type="application/json+oembed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/oembed/1.0/embed?url=http%3A%2F%2Felmos.scripts.mit.edu%2Fmathofdeeplearning%2F2017%2F04%2F14%2Fmathematics-of-deep-learning-lecture-3%2F" />
+<link rel="alternate" type="text/xml+oembed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/oembed/1.0/embed?url=http%3A%2F%2Felmos.scripts.mit.edu%2Fmathofdeeplearning%2F2017%2F04%2F14%2Fmathematics-of-deep-learning-lecture-3%2F&#038;format=xml" />
+
+<link rel='dns-prefetch' href='//v0.wordpress.com'>
+<style type='text/css'>img#wpstats{display:none}</style>		<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+		
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Mathematics of Deep Learning: Lecture 3 &#8211; More on depth separation." />
+<meta property="og:url" content="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/14/mathematics-of-deep-learning-lecture-3/" />
+<meta property="og:description" content="MathJax.Hub.Config({ TeX: { equationNumbers:{autoNumber: &#8220;AMS&#8221;}} }); Transcribed by Paxton Turner (edited by Asad Lodhia, Elchanan Mossel and Matthew Brennan) In the Boolean circuits se…" />
+<meta property="article:published_time" content="2017-04-14T07:34:54+00:00" />
+<meta property="article:modified_time" content="2017-06-21T21:30:47+00:00" />
+<meta property="og:site_name" content="Mathematical Aspects of Deep Learning" />
+<meta property="og:image" content="https://s0.wp.com/i/blank.jpg" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary" />
+
+<style id="custom-css-css">body{counter-reset:h2counter}h1{counter-reset:h2counter}h2:before{content:counter(h2counter) ".";counter-increment:h2counter;counter-reset:h3counter}h3:before{content:counter(h2counter) "." counter(h3counter) ".";counter-increment:h3counter}.theorem{display:block;margin:12px 0;font-style:italic}.theorem:before{content:"Theorem.";font-weight:700;font-style:normal}.claim{display:block;margin:12px 0;font-style:italic}.claim:before{content:"Claim.";font-weight:700;font-style:normal}.proposition{display:block;margin:12px 0;font-style:italic}.proposition:before{content:"Proposition.";font-weight:700;font-style:normal}.lemma{display:block;margin:12px 0;font-style:italic}.lemma:before{content:"Lemma.";font-weight:700;font-style:normal}.proof{display:block;margin:12px 0;font-style:normal}.proof:before{content:"Proof.";font-style:italic}.proof:after{content:"\25FC";float:right}.definition{display:block;margin:12px 0;font-style:normal}.definition:before{content:"Definition.";font-weight:700;font-style:normal}.remark{display:block;margin:12px 0;font-style:normal}.remark:before{content:"Remark.";font-weight:700;font-style:normal}</style>
+</head>
+
+<body class="single single-post postid-123 single-format-standard">
+<div id="page" class="site">
+	<div class="site-inner">
+		<a class="skip-link screen-reader-text" href="#content">Skip to content</a>
+
+		<header id="masthead" class="site-header" role="banner">
+			<div class="site-header-main">
+				<div class="site-branding">
+					
+											<p class="site-title"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/" rel="home">Mathematical Aspects of Deep Learning</a></p>
+									</div><!-- .site-branding -->
+
+							</div><!-- .site-header-main -->
+
+					</header><!-- .site-header -->
+
+		<div id="content" class="site-content">
+
+<div id="primary" class="content-area">
+	<main id="main" class="site-main" role="main">
+		
+<article id="post-123" class="post-123 post type-post status-publish format-standard hentry category-uncategorized">
+	<header class="entry-header">
+		<h1 class="entry-title">Mathematics of Deep Learning: Lecture 3 &#8211; More on depth separation.</h1>	</header><!-- .entry-header -->
+
+	
+	
+	<div class="entry-content">
+		<p><script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: { equationNumbers:{autoNumber: "AMS"}}
+});
+</script></p>
+
+<p><em> Transcribed by Paxton Turner (edited by Asad Lodhia, Elchanan Mossel and Matthew Brennan) </em></p>
+<p>In the Boolean circuits setup, there is a separation result based on depth of the following form: </p>
+<div class="theorem"> (Rossman, Servedio, Tan): There exists a function \(f: \{0,1\}^n \to \mathbb{R} \) that can be computed by a linear size depth \( d \) formula using AND, OR, and NOT gates such that any depth \(d &#8211; 1\) circuit that agrees with \(f\) on \(1/2 + o(1) \) inputs is of size \(\exp(n^{\Omega(1/d)}) \)
+</div>
+<p> <b> Question: </b> Can we prove a similar result for deep nets?
+<p>Last time we discussed the following separation result. </p>
+<div class="theorem"> (Eldan, Shamir): There exists a probability measure on \( \mathbb{R}^d \) and \(g: \mathbb{R}^d \to [-2,2] \) which is:</p>
+<ul>
+<li> supported on \( \{x: ||x||^2 \leq Cd \} \) and expressible by a 3-layer network of width \( \text{poly}(d) \). </li>
+<li> for all \( f\) supported by a 2-layer network of width \( \exp(\epsilon d) \) it holds that<br />
+\[<br />
+\mathbb{E}_\mu[ |f &#8211; g|^2 ] \geq \epsilon.<br />
+\]
+</li>
+</ul>
+</div>
+<p>Today we will discuss a more elegant treatment of the 2 vs. 3 separation result which yields slightly stronger results. </p>
+<h1> Danielly&#8217;s Model </h1>
+<p>Danielly&#8217;s Model is formed as follows. Let \( x, x&#8217; \) chosen uniformly (i.e., with respect to the Haar measure) from \(S^{d-1}\) and let \(f(x, x&#8217;)  = g(\langle x, x&#8217; \rangle) \). The nets of depth \(\ell\) are of the form:<br />
+\begin{eqnarray*}<br />
+\ell = 2 \qquad &#038;w_2^{\text{T}} \sigma( W_1 x + W_2 x&#8217; + b_1) + b_2 \\<br />
+\ell = 3  \qquad &#038;w_3^{\text{T}} \sigma (W_2 \sigma(W_1 x + W_2 x&#8217; + b_1) + b_2) + b_3 \\<br />
+\vdots \qquad &#038;\vdots<br />
+\end{eqnarray*}<br />
+on the input \((x, x&#8217;)\). Here, we prove the following theorem.</p>
+<p></UL></p>
+<div class="theorem"> If \( g:[-1,1] \to [-1,1] \) is \(L\)-Lipschitz, then there exists a 3-layer representation \(F\) of \(f\) with width \( O(d^2 L / \epsilon) \) and weights bounded by \(O(1 + L) \) and \( ||f &#8211; F||_{\infty} \leq \epsilon \).
+</div>
+<p>This illustrates the &#8220;magic of 3.&#8221; Intuitively, we see the power of quadratic models over linear ones, at least for this specific context. </p>
+<p>We begin with the following lemma which is of the flavor of universality of depth 1 nets: </p>
+<div class="lemma"> If \(f: [-R, R]\) is \(L\)-Lipschitz for all \( \epsilon > 0 \), then \(f\) can be approximated with \(\beta_i \leq R, \alpha_i \leq 2L\), and \(\gamma_i \in \{-1, 1\} \) as follows:<br />
+\[<br />
+\left\|f(x) &#8211; f(0) &#8211; \sum_{i=1}^m \alpha_i \sigma(\gamma_i x &#8211; \beta_i) \right\|_{\infty} \leq \epsilon, \, m \leq \frac{2RL}{\epsilon}<br />
+\]
+</div>
+<p><em> Proof of Lemma (Sketch): </em> Repartition the interval, and note that the Lipschitz condition implies the graph doesn&#8217;t deviate too far from a straight line.</p>
+<p><em> Proof of the Theorem: </em> We will prove the theorem in the following section and then show a corresponding lower bound.</p>
+<h2> Upper bound </h2>
+<p>We first show that the function can be approximated well by a depth 3 net:<br />
+\[<br />
+\langle x, x&#8217; \rangle = \Bigg\| \frac{x+x&#8217;}{2} \Bigg\|_2^2 &#8211; \frac{1}{2} = \sum_{i=1}^d \left( \frac{x + x&#8217;}{2} \right)^2,<br />
+\]</p>
+<p>which implies that a 2-layer network approximates \( \langle x, x&#8217; \rangle \) well. We can also compute \( \sigma( \langle x, x&#8217; \rangle) \) as a linear combination of the previous layers. This in combination with the lemma implies the desired result. </p>
+<h2> Lower bound </h2>
+<p>We want to show that a depth two net that approximates the function well is<br />
+very wide. For the analysis it will be useful to answer the following question: </p>
+<p> Question: What is the distribution of \( \langle x, x&#8217; \rangle \)? </p>
+<p> Approximation: Rotation invariance implies that</p>
+<p>\[<br />
+D(\langle x, x&#8217; \rangle) = D'( \langle x, r \rangle ) = D( \langle x, e_1 \rangle) = D(x_1)<br />
+\]<br />
+Note that this is also true if \( x&#8217; \) is deterministic and \( x \) is random. </p>
+<p> The individual components \(\langle x, e_k \rangle\) of a uniform random vector in \( x \in S^{d-1}\) approaches a Gaussian as \(d \to \infty \). Indeed,<br />
+\begin{eqnarray*}<br />
+d \mu_d(x) &#038;= \text{Vol}\left( (1 &#8211; x^2)^{1/2} S^{d-2} \right) \\<br />
+&#038;= \frac{\Gamma(d/2)}{\sqrt{\pi} \Gamma((d-1)/2)} \left(1 &#8211; x^2 \right)^{\frac{d-3}{2}}<br />
+\end{eqnarray*}<br />
+which is a t-statistic distribution (and as \(d \to \infty\) converges to a gaussian). The same reasoning applies also if one of the vectors x, x&#8217; is fixed. Therefore, if \(g = \psi ( \langle v, x \rangle, \langle v&#8217;, x&#8217; \rangle ) \), then<br />
+\[<br />
+||g||_2^2 = ||\psi||_{L^2(\mu_d \times \mu_d)}^2,<br />
+\]<br />
+and if \(f = \phi( \langle x, x&#8217; \rangle ) \), then<br />
+\[<br />
+||f||_2^2 = ||\phi||_{L^2(\mu_d)}^2 = \int_{S^{d-1} \times S^{d-1}} f^2(x, x&#8217;) \, d(m \times m),<br />
+\]<br />
+where \(d(m \times m)\) indicates the Haar measure. </p>
+<p> <b> Orthogonal Polynomials: </b> Define \( P_0 = 1, P_1 = x,\) and<br />
+\[P_n = \frac{2n + d &#8211; 4}{n + d &#8211; 3} \cdot P_{n-1}(x) &#8211; \frac{n &#8211; 1}{n + d &#8211; 3} \cdot P_{n-2}(x)\]<br />
+We observe that<br />
+\[<br />
+||P_n||_2^2 = 1/N_{n,d} \quad \text{where} \quad N_{n,d} = \frac{(2n + d &#8211; 2) (n + d &#8211; 3)!}{n! (d &#8211; 2)!}<br />
+\]<br />
+and that \( ||P_n||_{\infty} = 1\). Now define<br />
+\[<br />
+h_n(x, x&#8217;) = \frac{P_n(\langle x, x&#8217; \rangle)}{\sqrt{N_{n,d}}} \quad \text{and} \quad L_n^x(x)  = h_n(x,x).<br />
+\]<br />
+The key fact we use is that<br />
+\[<br />
+\langle L_i^v, L_j^v \rangle = \mathbb{E}[ L_i^v(x) L_j^{v&#8217;}(x)] = \mathbb{E}[h_i(\langle v, x \rangle) h_j(\langle v&#8217;, x \rangle) ] = \delta_{i,j} P_i(\langle v, v&#8217; \rangle),<br />
+\]<br />
+which implies<br />
+\[<br />
+\mathbb{E}[h_n(x, x&#8217;) L_i^v(x) L_j^{v&#8217;}(x)] = 1(i  = j = n) N_{n_1}^{-1/2} P_n(\langle v, v&#8217; \rangle).<br />
+\]<br />
+To flesh out the above more carefully,<br />
+\begin{align*}<br />
+\mathbb{E}[h_n(x,x&#8217;) L_i^v(x) L_j^{v&#8217;}(x&#8217;)] &#038;= \mathbb{E}_x\left[L_i^v(x) \mathbb{E}_{x&#8217;}[h_n(x,x&#8217;) L_j^{v&#8217;}(x&#8217;)]\right] \\<br />
+&#038;= \mathbb{E}_x[L_i^v \delta_{j = n} P_n(v&#8217;, x)] \\<br />
+&#038;= \mathbb{E}_x\left[L_i^v(x) \frac{L_j^{v&#8217;}(x)}{\sqrt{N_{n,d}}}\right]<br />
+\end{align*}</p>
+<p><b> Lower Bound Idea: </b> We now outline how to obtain the desired lower bound. Expand \(g(x, x&#8217;) = \sum \alpha_i h_i(x,x&#8217;) \) and choose \(f\) that is &#8220;noise sensitive&#8221;, i.e., has a lot of mass at higher Fourier levels. For the rest of the argument assume that \( f = h_n \) for a large \(n\) (though \( h_n \) is not a Lip function, but we can find a Lip function that has a lot of weight on high levels). </p>
+<p> We want \( ||g &#8211; \sum_{j=1}^m g_j ||_2^2 \) to be large when \(g_j = b_j \sigma( \langle v_j, x \rangle) \geq c \) unless either \(b_j\) is large. Otherwise, there exists \(j\) such that \( \langle g, g_j \rangle \geq \frac{c}{m} \). Note that if \(h_n\) is close to \(\sum_{j = 1}^m g_j \), then we need to have at least one \(j\) where \( \langle g_j, f \rangle \geq \frac{||f||_2^2}{4m}. \)</p>
+<p> We now compute \( \langle g_j , f \rangle \). Observe that<br />
+\[<br />
+g_j = \sum \beta_{k, \ell} L_k^v(x) L_{\ell}^{v&#8217;}(x&#8217;)<br />
+\]<br />
+\[<br />
+g_j(x,x&#8217;) = \psi(\langle v, x \rangle, \langle v&#8217;, x&#8217; \rangle)<br />
+\]<br />
+\[<br />
+\sum \beta_{k, \ell}^2 = ||g_j||_2^2.<br />
+\]<br />
+Therefore,<br />
+\[<br />
+|\langle g_j, h_n \rangle | = N_{n,d}^{-1/2} |\beta_{n,n} P_n( \langle v, v&#8217; \rangle )| \leq N_{n,d}^{-1/2} |\beta_{n,n}|<br />
+\]<br />
+so \(m\) is very large or \(||g_j^2||_2^2\) is very large. Informally, we get a bad approximation of \(h_n(\langle x, x&#8217; \rangle) \) unless<br />
+<UL><br />
+<LI> Width \(\geq N_{n,d}^{\Omega(1)}\) or<br />
+<LI> Max-weight \(\geq N_{n,d}^{\Omega(1)} \)<br />
+</UL><br />
+<b> Open Questions: </b> 1.Can it really be that large weights solve the approximation problem? 2. Instead of working with the Haar measure, can this computation be performed in Gaussian space directly? We lose rotation invariance but it is a bit strange we work with measure that are in some sense getting close to Gaussian measure and cannot prove it directly in Gaussian space. </p>
+<h1> Kane-Williams Model </h1>
+<p> Threshold gates are given by</p>
+<p>\[<br />
+\mathbf{1}\left\{\sum w_i x_i \geq t\right\}.<br />
+\]</p>
+<div class="theorem">
+There exists a function \( A_n: \{0,1\}^n \to \{0,1\} \) that can be computed<br />
+<UL><br />
+<LI> Using a 3-layer threshold circuit with \(O(n)\) gates,<br />
+<LI> but requires at least \( \Omega(n^{3/2}) \) gates to be computed correctly on \(.5 + \epsilon \) of inputs by a 2-layer circuit.<br />
+</UL>
+</div>
+<p>The basic unit threshold is<br />
+\[<br />
+f(x) = \text{sgn}(w_0 + \sum_{i = 1}^n w_i x_i).<br />
+\]</p>
+<p>We assume a distribution that is uniform over \(\{0,1\}^n\). </p>
+<p><b> Meta-Question: </b> Can we use reduction between models (eg, the previous result) to get better separation in the binary case?</p>
+<p> <em> Partial answer: </em> Due to complexity-theoretic issues, better than \( \text{poly}(n) \) isn&#8217;t possible. </p>
+<p> <b> Question: </b> Can we replace new activations into the previous result (or this one)?</p>
+<p> <em> Answer: </em> Isn&#8217;t written down, but should be straightforward. </p>
+<div class="proof">
+First define the function \(A_n = A_{2^{k+1}}\).<br />
+\[<br />
+M(x_1, \ldots, x_{2^k}, a_1, \ldots, a_k) = x_{a_1} \ldots x_{a_k}<br />
+\]<br />
+is a Mux function generalization. Next,<br />
+\[<br />
+A_n(x_1, \ldots, x_{2^k}, a_1, \ldots, a_{2^k}) = M(x_1, \ldots, x_{2^k}, \oplus_{i=1}^{2^k/k} a_i, \oplus_{i=2^k/k + 1}^{2 \cdot 2^k/k} , \ldots),<br />
+\]<br />
+where \(\oplus_{i=1}^{2^k/k} a_i\) indicates the parity of the slice of the string. </p>
+<p> <b> Claim 1: </b> \(M\) can be computed depth 2 using \(O(n \log n)\) gates.</p>
+<p> <b> Claim 2: </b> Parity can be computed using threshold gates.</p>
+<p> Proof of Claim 2: Let</p>
+<p>\[<br />
+\sum x_i \geq 1 \to b_1<br />
+\]</p>
+<p>\[<br />
+\vdots<br />
+\]</p>
+<p>\[<br />
+\sum x_i \geq n \to b_n.<br />
+\]</p>
+<p>It can be shown that there exist weights \( w_1, \ldots w_n\) such that</p>
+<p>\[<br />
+\text{sgn}(\sum w_i b_i) = \oplus x_i.<br />
+\]</p>
+<p>In fact, this can be done with \(1 \leq w \leq \text{poly}(k)\), though we don&#8217;t show this here.</p>
+<p> <b> Lower bound ingredients: </b> We now move onto the lower bound.</p>
+<p> <b> Lemma: </b> For all but \( \epsilon \) of \(n\)-bit Boolean functions \(f\), there is no depth 2 network of size less than \( o(\epsilon^2 2^n/n) \) that agrees with \(f\) on more than \(.5 + \epsilon\) of the inputs. </p>
+<p> <b> Proof sketch of lemma: </b> The number of threshold functions is less than \(2^{O(n^2)}\), while the total number of functions is \(2^{2^n}\). That is, there aren&#8217;t too many threshold functions in general. Also, for most Boolean functions \(f\) on \(\{0,1\}^n\), a 2-layer network of size \(O(\frac{\xi 2^n}{n^2})\) does not approximate \(f\) well. </p>
+<p> Returning to the proof of the lemma, the idea is to generate a random function, allowing us to use the lemma&#8217;s statement that most functions do not approximate \(f\) well. The construction is:</p>
+<p><UL><br />
+<LI>Pick \(x\) randomly.<br />
+<LI> In each block of \(a_i\), fix all coordinates but one randomly.<br />
+<LI>This generates a random function on \(k\) variables.<br />
+</UL></p>
+<p><b> Question: </b> How does a 2-layer look like after fixing randomly almost all bits?</p>
+<p> Intuitive answer: Once enough bits are fixed, most gates become constant and die. Then we&#8217;re left with a smaller network which can&#8217;t approximate \(f\) well. </p>
+<p> <b> Main Lemma: </b> A random restriction of a threshold gate will result in a constant function with probability at least<br />
+\[<br />
+1 &#8211; O(\log n / n^{1/2}).<br />
+\]<br />
+Thus, the number of gates that remain is \( O(n/\log^2(n)) \), which is not enough to represent a random function.
+</div>
+<h1> PAC Learning </h1>
+<p> We close this lecture with the definition of <b> PAC-learning </b>. We have a space \(X_n\) and are interested in functions \( f: X_n \to \{0,1\} \). Let \( \mathcal{C} \) be the class of such functions (eg, 2-layer networks). </p>
+<div class="definition">
+The class \(\mathcal{C}\) is PAC-learnable if for all \( \epsilon, \delta \) and for all distributions \(D\) on \(X_n\), there exists an algorithm \(A\) such that given \(\text{poly}(n, 1/\epsilon, 1/\delta)\) samples<br />
+\[(x_i, y_i); \, x \sim D ; \, y_i = f(x_i); \, f \in \mathcal{C},<br />
+\]<br />
+with probability larger than \(1 &#8211; \delta\), \(A\) returns a function \(h: X_n \to \{0,1\}\) such that<br />
+\[<br />
+\mathbb{P}[h(x) \neq f(x)] \leq \epsilon<br />
+\]<br />
+and \(A\) runs in \(\text{poly}(n, 1/\epsilon, 1/\delta)\).
+</div>
+<p>Here, \(\delta\) is interpreted as a <i> global parameter </i>, and \(\epsilon\) is the <i> probabilistic error </i>. </p>
+	</div><!-- .entry-content -->
+
+	<footer class="entry-footer">
+		<span class="byline"><span class="author vcard"><img alt='' src='http://2.gravatar.com/avatar/b149ee3c951d4c5946a62273f37709b6?s=49&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/b149ee3c951d4c5946a62273f37709b6?s=98&amp;d=mm&amp;r=g 2x' class='avatar avatar-49 photo' height='49' width='49' /><span class="screen-reader-text">Author </span> <a class="url fn n" href="http://elmos.scripts.mit.edu/mathofdeeplearning/author/elmos/">elmos</a></span></span><span class="posted-on"><span class="screen-reader-text">Posted on </span><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/14/mathematics-of-deep-learning-lecture-3/" rel="bookmark"><time class="entry-date published" datetime="2017-04-14T07:34:54+00:00">April 14, 2017</time><time class="updated" datetime="2017-06-21T21:30:47+00:00">June 21, 2017</time></a></span>			</footer><!-- .entry-footer -->
+</article><!-- #post-## -->
+
+	<nav class="navigation post-navigation" role="navigation">
+		<h2 class="screen-reader-text">Post navigation</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/09/mathematics-of-deep-learning-lecture-2/" rel="prev"><span class="meta-nav" aria-hidden="true">Previous</span> <span class="screen-reader-text">Previous post:</span> <span class="post-title">Mathematics of Deep Learning: Lecture 2 &#8211; Depth Separation.</span></a></div><div class="nav-next"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/08/mathematics-of-deep-learning-lecture-4/" rel="next"><span class="meta-nav" aria-hidden="true">Next</span> <span class="screen-reader-text">Next post:</span> <span class="post-title">Mathematics of Deep Learning: Lecture 4 &#8211; PAC Learning and Deep Nets</span></a></div></div>
+	</nav>
+	</main><!-- .site-main -->
+
+	
+</div><!-- .content-area -->
+
+
+	<aside id="secondary" class="sidebar widget-area" role="complementary">
+		<section id="search-2" class="widget widget_search">
+<form role="search" method="get" class="search-form" action="http://elmos.scripts.mit.edu/mathofdeeplearning/">
+	<label>
+		<span class="screen-reader-text">Search for:</span>
+		<input type="search" class="search-field" placeholder="Search &hellip;" value="" name="s" />
+	</label>
+	<button type="submit" class="search-submit"><span class="screen-reader-text">Search</span></button>
+</form>
+</section>		<section id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widget-title">Recent Posts</h2>		<ul>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-8-hierarchical-generative-models-for-deep-learning/">Mathematics of Deep Learning: Lecture 8 &#8211; Hierarchical Generative Models for Deep Learning</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-7-recovering-tree-models/">Mathematics of Deep Learning: Lecture 7 &#8211; Recovering Tree Models</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/29/mathematics-of-deep-learning-lecture-6-simple-hierarchical-models/">Mathematics of Deep Learning: Lecture 6 &#8211; Simple hierarchical models</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/28/mathematics-of-deep-learning-lecture-5-random-sparse-nets-etc/">Mathematics of Deep Learning: Lecture 5 &#8211; Random Sparse Nets etc.</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/08/mathematics-of-deep-learning-lecture-4/">Mathematics of Deep Learning: Lecture 4 &#8211; PAC Learning and Deep Nets</a>
+						</li>
+				</ul>
+		</section>		<section id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widget-title">Recent Comments</h2><ul id="recentcomments"></ul></section><section id="archives-2" class="widget widget_archive"><h2 class="widget-title">Archives</h2>		<ul>
+			<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/'>July 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/'>May 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/'>April 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/03/'>March 2017</a></li>
+		</ul>
+		</section><section id="categories-2" class="widget widget_categories"><h2 class="widget-title">Categories</h2>		<ul>
+	<li class="cat-item cat-item-1"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/category/uncategorized/" >Uncategorized</a>
+</li>
+		</ul>
+</section><section id="meta-2" class="widget widget_meta"><h2 class="widget-title">Meta</h2>			<ul>
+						<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-login.php">Log in</a></li>
+			<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/feed/">Entries <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/comments/feed/">Comments <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="https://wordpress.org/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform.">WordPress.org</a></li>			</ul>
+			</section>	</aside><!-- .sidebar .widget-area -->
+
+		</div><!-- .site-content -->
+
+		<footer id="colophon" class="site-footer" role="contentinfo">
+			
+			
+			<div class="site-info">
+								<span class="site-title"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/" rel="home">Mathematical Aspects of Deep Learning</a></span>
+				<a href="https://wordpress.org/">Proudly powered by WordPress</a>
+			</div><!-- .site-info -->
+		</footer><!-- .site-footer -->
+	</div><!-- .site-inner -->
+</div><!-- .site -->
+
+	<div style="display:none">
+	<div class="grofile-hash-map-b149ee3c951d4c5946a62273f37709b6">
+	</div>
+	</div>
+<script type='text/javascript' src='http://s0.wp.com/wp-content/js/devicepx-jetpack.js?ver=201727'></script>
+<script type='text/javascript' src='http://s.gravatar.com/js/gprofiles.js?ver=2017Julaa'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/modules/wpgroho.js?ver=4.5.2'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/skip-link-focus-fix.js?ver=20160412'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var screenReaderText = {"expand":"expand child menu","collapse":"collapse child menu"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/functions.js?ver=20160412'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/wp-embed.min.js?ver=4.5.2'></script>
+<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=default&#038;ver=1.3.6'></script>
+<script type='text/javascript' src='http://stats.wp.com/e-201727.js' async defer></script>
+<script type='text/javascript'>
+	_stq = window._stq || [];
+	_stq.push([ 'view', {v:'ext',j:'1:4.4.2',blog:'122429706',post:'123',tz:'0',srv:'elmos.scripts.mit.edu'} ]);
+	_stq.push([ 'clickTrackerInit', '122429706', '123' ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en-US" class="no-js">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="profile" href="http://gmpg.org/xfn/11">
+		<script>(function(html){html.className = html.className.replace(/\bno-js\b/,'js')})(document.documentElement);</script>
+<title>Mathematics of Deep Learning: Lecture 6 &#8211; Simple hierarchical models &#8211; Mathematical Aspects of Deep Learning</title>
+<link rel="alternate" type="application/rss+xml" title="Mathematical Aspects of Deep Learning &raquo; Feed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Mathematical Aspects of Deep Learning &raquo; Comments Feed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/comments/feed/" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/elmos.scripts.mit.edu\/mathofdeeplearning\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.5.2"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;if(!g||!g.fillText)return!1;switch(g.textBaseline="top",g.font="600 32px Arial",a){case"flag":return g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3;case"diversity":return g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,d=c[0]+","+c[1]+","+c[2]+","+c[3],g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e;case"simple":return g.fillText(h(55357,56835),0,0),0!==g.getImageData(16,16,1,1).data[0];case"unicode8":return g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0]}return!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i;for(i=Array("simple","flag","unicode8","diversity"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='twentysixteen-jetpack-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/modules/theme-tools/compat/twentysixteen.css?ver=4.4.2' type='text/css' media='all' />
+<link rel='stylesheet' id='twentysixteen-fonts-css'  href='https://fonts.googleapis.com/css?family=Merriweather%3A400%2C700%2C900%2C400italic%2C700italic%2C900italic%7CMontserrat%3A400%2C700%7CInconsolata%3A400&#038;subset=latin%2Clatin-ext' type='text/css' media='all' />
+<link rel='stylesheet' id='genericons-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/_inc/genericons/genericons/genericons.css?ver=3.1' type='text/css' media='all' />
+<link rel='stylesheet' id='twentysixteen-style-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/style.css?ver=4.5.2' type='text/css' media='all' />
+<!--[if lt IE 10]>
+<link rel='stylesheet' id='twentysixteen-ie-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 9]>
+<link rel='stylesheet' id='twentysixteen-ie8-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie8.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 8]>
+<link rel='stylesheet' id='twentysixteen-ie7-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/css/ie7.css?ver=20160412' type='text/css' media='all' />
+<![endif]-->
+<link rel='stylesheet' id='jetpack_css-css'  href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/css/jetpack.css?ver=4.4.2' type='text/css' media='all' />
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/jquery/jquery.js?ver=1.12.3'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.0'></script>
+<!--[if lt IE 9]>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/html5.js?ver=3.7.3'></script>
+<![endif]-->
+<link rel='https://api.w.org/' href='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://elmos.scripts.mit.edu/mathofdeeplearning/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='Mathematics of Deep Learning: Lecture 5 &#8211; Random Sparse Nets etc.' href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/28/mathematics-of-deep-learning-lecture-5-random-sparse-nets-etc/' />
+<link rel='next' title='Mathematics of Deep Learning: Lecture 7 &#8211; Recovering Tree Models' href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-7-recovering-tree-models/' />
+<meta name="generator" content="WordPress 4.5.2" />
+<link rel="canonical" href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/29/mathematics-of-deep-learning-lecture-6-simple-hierarchical-models/" />
+<link rel='shortlink' href='http://wp.me/p8hHyG-2T' />
+<link rel="alternate" type="application/json+oembed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/oembed/1.0/embed?url=http%3A%2F%2Felmos.scripts.mit.edu%2Fmathofdeeplearning%2F2017%2F05%2F29%2Fmathematics-of-deep-learning-lecture-6-simple-hierarchical-models%2F" />
+<link rel="alternate" type="text/xml+oembed" href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-json/oembed/1.0/embed?url=http%3A%2F%2Felmos.scripts.mit.edu%2Fmathofdeeplearning%2F2017%2F05%2F29%2Fmathematics-of-deep-learning-lecture-6-simple-hierarchical-models%2F&#038;format=xml" />
+
+<link rel='dns-prefetch' href='//v0.wordpress.com'>
+<style type='text/css'>img#wpstats{display:none}</style>		<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+		
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Mathematics of Deep Learning: Lecture 6 &#8211; Simple hierarchical models" />
+<meta property="og:url" content="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/29/mathematics-of-deep-learning-lecture-6-simple-hierarchical-models/" />
+<meta property="og:description" content="MathJax.Hub.Config({ TeX: { equationNumbers: { autoNumber: &#8220;AMS&#8221; }, extensions: [&#8220;AMSmath.js&#8221;]} }); Transcribed by Govind Ramnarayan (edited by Mathew Brennan, Asad Lodhia a…" />
+<meta property="article:published_time" content="2017-05-29T14:49:47+00:00" />
+<meta property="article:modified_time" content="2017-07-01T18:43:53+00:00" />
+<meta property="og:site_name" content="Mathematical Aspects of Deep Learning" />
+<meta property="og:image" content="https://s0.wp.com/i/blank.jpg" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary" />
+
+<style id="custom-css-css">body{counter-reset:h2counter}h1{counter-reset:h2counter}h2:before{content:counter(h2counter) ".";counter-increment:h2counter;counter-reset:h3counter}h3:before{content:counter(h2counter) "." counter(h3counter) ".";counter-increment:h3counter}.theorem{display:block;margin:12px 0;font-style:italic}.theorem:before{content:"Theorem.";font-weight:700;font-style:normal}.claim{display:block;margin:12px 0;font-style:italic}.claim:before{content:"Claim.";font-weight:700;font-style:normal}.proposition{display:block;margin:12px 0;font-style:italic}.proposition:before{content:"Proposition.";font-weight:700;font-style:normal}.lemma{display:block;margin:12px 0;font-style:italic}.lemma:before{content:"Lemma.";font-weight:700;font-style:normal}.proof{display:block;margin:12px 0;font-style:normal}.proof:before{content:"Proof.";font-style:italic}.proof:after{content:"\25FC";float:right}.definition{display:block;margin:12px 0;font-style:normal}.definition:before{content:"Definition.";font-weight:700;font-style:normal}.remark{display:block;margin:12px 0;font-style:normal}.remark:before{content:"Remark.";font-weight:700;font-style:normal}</style>
+</head>
+
+<body class="single single-post postid-179 single-format-standard">
+<div id="page" class="site">
+	<div class="site-inner">
+		<a class="skip-link screen-reader-text" href="#content">Skip to content</a>
+
+		<header id="masthead" class="site-header" role="banner">
+			<div class="site-header-main">
+				<div class="site-branding">
+					
+											<p class="site-title"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/" rel="home">Mathematical Aspects of Deep Learning</a></p>
+									</div><!-- .site-branding -->
+
+							</div><!-- .site-header-main -->
+
+					</header><!-- .site-header -->
+
+		<div id="content" class="site-content">
+
+<div id="primary" class="content-area">
+	<main id="main" class="site-main" role="main">
+		
+<article id="post-179" class="post-179 post type-post status-publish format-standard hentry category-uncategorized">
+	<header class="entry-header">
+		<h1 class="entry-title">Mathematics of Deep Learning: Lecture 6 &#8211; Simple hierarchical models</h1>	</header><!-- .entry-header -->
+
+	
+	
+	<div class="entry-content">
+		<p><script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: { equationNumbers: { autoNumber: "AMS" }, extensions: ["AMSmath.js"]}
+});
+</script></p>
+<p><br />
+<em> Transcribed by  Govind Ramnarayan (edited by Mathew Brennan, Asad Lodhia and Elchanan Mossel) </em></p>
+<h1> Some Very Simple (Gaussian) Hierarchical Models </h1>
+<p>We start by describing some very simple hierarchical models on the <em> \(d\)-ary tree </em>. Recall that in the \(d\)-ary tree, each node in the tree has exactly \(d\) children (As opposed to the \(d\)-regular tree, in which the root has \(d\) children, and every other node has \(d-1\) children). Both models will feature an unknown character at the root, chosen according to some distribution. Each node propagates its character to its children with some Gaussian noise. The goal will be to recover the character at the root given the characters at some level \(\ell\).</p>
+<h2> Version 1 (Brownian Motion) </h2>
+<p>We will denote the character at the vertex \(v\) by \(X_v\), with the root being denoted as 0.</p>
+<p>\(X_0\) will be distributed according to an unknown distribution \(\mu\), with<br />
+\[<br />
+X_v = X_0 + \sum_{w \in \text{path}(0,v) \backslash \{0\}} \sigma \mathcal{N}_w<br />
+\]<br />
+where \(\mathcal{N}_w\) are i.i.d. \(N(0,1)\) random variables, and \(\sigma\) is a fixed parameter.</p>
+<p>The goal is to estimate \(X_0\) given \(\left\{ X_{v}: v \in L_{\ell}\right\}\), the set of labels at level \(\ell\). However, this model will not be the one we focus on today.</p>
+<h2> Version 2 (Ornstein-Uhlenbeck) </h2>
+<p>This is similar to the above model, but instead \(X_0 \sim N(0,1)\) and if \(v\) is a parent of \(w\) then<br />
+\[<br />
+X_w = \eta X_v + \sqrt{1 &#8211; \eta^2} \mathcal{N}_w<br />
+\]<br />
+where \(\mathcal{N}_w\) are i.i.d \(N(0,1)\).</p>
+<p>An important observation about this model is that \(X_w \sim N(0,1)\) for <em> all nodes \(w\) </em>.</p>
+<p> Just like in the previous model, we want to estimate \(X_0\) given \(\left\{X_v: v \in L_{\ell}\right\}\). The question is, how should we do it? A natural attempt is to take the average of the children, which we now analyze.</p>
+<p>Note that \((X_0, X_v: v \in L_\ell)\) is jointly Gaussian. This means that the estimate that minimizes the \(\ell_2\) error<br />
+\[<br />
+\mathbb{E}\left[X_0 \Big|(X_v)_{v \in L_{\ell}}\right]<br />
+\]<br />
+can be written as \(\sum_{v \in L_{\ell}} a_v X_v\), by the definition  of being jointly Gaussian. Also, by symmetry of the model, all the \(a_v\)&#8217;s  are the same, so we can write this as \(a \sum_{v \in L_{\ell}} X_v\).</p>
+<p>So to find the correct estimate for \(X_0\), it suffices to find the value of \(a\) that minimizes<br />
+\[<br />
+\mathbb{E}\left[\left(X_0 &#8211; a \sum X_v\right)^2\right]<br />
+\]<br />
+which we now proceed to do. We begin by computing the mean squared error<br />
+\begin{align*}<br />
+\mathbb{E}\left[\left(X_0 &#8211; a \sum X_v\right)^2\right] &#038;= \mathbb{E}[X_0^2] + a^2\sum \mathbb{E}[X_v^2] &#8211; 2ad^{\ell}\text{Cov}(X_0, X_v) + a^2 \sum_{v \neq w \in L_{\ell}} \text{Cov}(X_v, X_w) \\<br />
+  &#038;= 1 + d^{\ell}a^2 &#8211; 2ad^{\ell}\eta^{\ell} + a^2 d^{\ell} \sum\limits_{j=1}^{\ell} \eta^{2j} (d-1)d^{j-1} \\<br />
+  &#038;= 1 + d^{\ell}\left(-2a\eta^{\ell} + \frac{a^2(d-1)}{d} \cdot<br />
+    \frac{(d \eta^2)^{\ell + 1} &#8211; 1}{(d\eta^2) &#8211; 1} \right)<br />
+\end{align*}<br />
+The second line follows from expanding out the sum and the fact that there are \(d^{\ell}\) nodes at level \(\ell\). The third line follows from the fact that the covariance of \(X_v\) and \(X_w\) is dependent on the distance between them in the underlying tree: namely, if the distance between them is \(D\), then \(\mathbb{E}[X_v X_w] = \eta^D\). Since all the vertices in the final sum are at the level \(\ell\), they are at an even distance on the tree (the distance is \(2j\), where \(j\) denotes the distance between the vertices and their lowest common ancestor on the tree). The fourth line follows from the formula for computing the sum of a geometric series.</p>
+<p> We can compute the value of \(a\) that minimizes<br />
+\begin{equation}<br />
+1 + d^{\ell} \left(-2a\eta^{\ell} + \frac{a^2(d-1)}{d} \cdot \frac{(d \eta^2)^{\ell + 1} &#8211; 1}{(d\eta^2) &#8211; 1} \right)<br />
+\end{equation}<br />
+by taking the derivative with respect to \(a\) (this can also be accomplished approximately by setting the two terms in the sum to be equal and solving for \(a\)). Doing so, we get that<br />
+\begin{equation}<br />
+  a = \eta^{\ell} \left(\frac{d-1}{d} \cdot \frac{(d\eta^2)^{\ell}}{d\eta^2 &#8211; 1} \right)^{-1}<br />
+\end{equation}<br />
+Now we realize that the optimal squared error \( \mathbb{E}\left[\left(X_0 &#8211; a \sum X_v\right)^2\right] \) at this value of \( a \), as given by the computation above, behaves very differently when \(d \eta^2 < 1\) versus when \(d \eta^2 > 1\). When \(d \eta^2 < 1\), we notice that \(\frac{(d \eta^2)^{\ell + 1} - 1}{(d\eta^2) - 1}\) is approximately a constant. Furthermore, the optimal value of \(a\) is roughly \(\eta^{\ell}\), and so our expression for the optimal squared error becomes 
+\[
+\mathbb{E}\left[\left(X_0 - a \sum X_v\right)^2\right] \approx 1 + d^{\ell}a(-2\eta^{\ell} + a \Theta(1)) \approx 1 +
+d^{\ell}\eta^{2\ell} \approx 1
+\]
+Note also that a squared error of 1 would be accomplished by simply ignoring the leaves and estimating \(X_0\) by 0.
+
+
+<p> By contrast, when \(d\eta^2 > 1\), we argue that the optimal squared error is less than 1. Plugging in the minimizing value of \(a\) gives that<br />
+\begin{align*}<br />
+\mathbb{E}\left[\left(X_0 &#8211; a \sum X_v\right)^2\right] &#038;= 1 + d^{\ell} \left(-2a\eta^{\ell} + \frac{a^2(d-1)}{d} \cdot \frac{(d \eta^2)^{\ell + 1} &#8211; 1}{(d\eta^2) &#8211; 1} \right) \\<br />
+  &#038;= 1 + d^{\ell}(-2a\eta^{\ell} + a\eta^{\ell}) \\<br />
+  &#038;= 1 &#8211; d^{\ell}\eta^{\ell} \left( \eta^{\ell} \frac{d}{d-1} \frac{d\eta^2 &#8211; 1}{(d\eta^2)^{\ell + 1} &#8211; 1} \right) \\<br />
+  &#038;\leq 1 &#8211; \frac{(d\eta^2)^{\ell}}{(d\eta^2)^{\ell + 1}} \cdot \frac{d}{d-1} \cdot (d\eta^2 &#8211; 1) \\<br />
+  &#038;< 1
+\end{align*}
+
+In summary, we have a threshold at \(d\eta^2 = 1\) for this simple model. If \(d\eta^2 > 1\), we have shown that we can estimate better than random with the optimal linear estimator. When \(d\eta^2 < 1\), we know that we cannot do better than random. But this model was a linear Gaussian model, which is not at all similar to the type of structure posed by deep learning (specifically, we know that deep learning has <em> non-linearities </em> that are applied at each layer, whereas the entire model here was linear). We&#8217;ll introduce some non-linearities in the next model to try to make it more interesting, and analyze the resulting behaviour.</p>
+<h1> Model 3: &#8220;Threshold&#8221; Version of Model 2 </h2>
+<p>In this model we deal with the same \(d\)-ary tree as before, but the initial distribution of \(X_0\) and the noise model we use will change.</p>
+<p>Specifically, \(X_0\) will be distributed uniformly in \([q] = \{ 1,\ldots, q\}\) and if \(w\) is the parent of \(v\), then<br />
+\[<br />
+X_v = \begin{cases}<br />
+  X_w &#038; \text{ w.p. $\eta$} \\<br />
+  \text{Unif}[q] &#038; \text{ w.p. } 1 &#8211; \eta<br />
+\end{cases}<br />
+\]</p>
+<div class="remark">
+An alternative view of the model is that each edge in the \(d\)-ary tree is erased with probability \(1 &#8211; \eta\). Then, the root of each component get a random symbol from \([q]\), and within each subtree the character is copied. So the labels within a component are the same, and the labels across components are independent.
+</div>
+<p>Our goal is as follows.</p>
+<p> <b> Goal: </b> Estimate \(X_0\) from \(\left(X_v: v \in L_{\ell}\right)\)</p>
+<p> Before continuing, we note that the error of any estimator is always at least \(\Theta(1)\) (where we are thinking of \(d\) and \(\eta\) as constants), since there is a chance that there is no copying at the first level! But this was also a problem for Model 2.</p>
+<p> <b> A First Attempt (Plurality): </b> One naive estimator is to take the value \(a \in [q]\) that is most common among the \(\left(X_v : v \in L_{\ell}\right)\) (i.e., taking the plurality vote amongst the leaves at level \(\ell\)). This is one of the most natural attempts, but is this the optimal estimator? We now analyse (a variant of) this estimator.</p>
+<p> We&#8217;ll analyse a variant of the plurality estimator. Let<br />
+\[<br />
+y_v =<br />
+\begin{cases}<br />
+  1 &#8211; 1/q &#038; \text{ if } X_v = 1 \\<br />
+  -1/q &#038; \text{ if } X_v \neq 1<br />
+\end{cases}<br />
+\]<br />
+The estimator we will use is the following:</p>
+<ol>
+<li> If \(S := \sum_{v \in L_\ell} y_v > 0\), then output 1. </li>
+<li> Otherwise, output a random character from \(\{ 2,\ldots, q\}\). </li>
+</ol>
+<div class="claim">
+The estimator described above outperforms a random estimator if and only if plurality does.
+</div>
+<p>We won&#8217;t formally prove this claim now &#8211; it will follow trivially from the results in the rest of lecture. However, intuitively \(S\) synchronizes with the plurality estimator when the root symbol is 1, and is random otherwise. If plurality does well, it should do well when the root symbol is 1 by symmetry. It is clear that in this case, \(S\) succeeds whenever plurality succeeds, so it outperforms the random estimator. If \(S\) works correctly, it means that 1 appeared more than \(\frac{1}{q}\) times at the leaves very frequently. The only way plurality could work poorly in this case is if the plurality element is not 1 on many of these occasions. However, by symmetry, every non-root element has lower probability of showing up at the leaves than the root element, so this will only happen if, for many of those times, 1 showed up in just a little more than \(\frac{1}{q}\) fraction of the leaves, but was beaten by a non-root symbol due to random deviation. However, intuitively, in this case 1 would not have showed up more than \(\frac{1}{q}\) times so often, because random deviation would often make it go below \(\frac{1}{q}\). We will indeed see that this is the case in the remainder of lecture.</p>
+<p> First we note a trivial claim about when we cannot hope to recover \(X_0\) better than random asymptotically.</p>
+<div class="claim">
+[Trivial Lower Bound] If \(d \eta < 1\) no estimator can do better than random asymptotically.
+</div>
+<div class="proof">
+ If \(d \eta < 1\), then the fraction of leaves that are connected to the root tends to zero. Therefore, no correlations between the leaves and the root will survive.
+</div>
+<p>How do we analyse this estimator? We&#8217;ll use the following three facts:<br />
+\[<br />
+\mathbb{E}\left[S | X_0 = 1\right] = \mathbb{E}\left[\text{v connected to root}\right] \cdot \left(1 &#8211; \frac{1}{q}\right) = (d \eta)^{\ell} \left(1 &#8211; \frac{1}{q}\right)<br />
+\]<br />
+\[<br />
+\mathbb{E}\left[S | X_0 \sim U\right] = 0<br />
+\]<br />
+which follows from the fact that each \(y_v\) is an unbiased random variable. Here \( U \) denotes the uniform distribution on \([q]\). Also,<br />
+\[<br />
+\text{Var}(S) \approx \Theta(d^{\ell})<br />
+\]<br />
+which follows from a direct computation very similar to the calculation in the previous model, where we minimized the \(\ell_2\)-error.</p>
+<p> From the above three observations, we can conclude that there is some \(\epsilon > 0\) such that<br />
+\[<br />
+d \eta^2 > 1 \Rightarrow \frac{\mathbb{E}\left[S | X_0 = 1\right] &#8211; \mathbb{E}\left[S | X_0 \sim U\right]}{\sqrt{\text{Var}(S)}} > \epsilon<br />
+\]<br />
+and furthermore that<br />
+\[ d\eta^2 < 1 \Rightarrow \frac{\mathbb{E}\left[S | X_0 = 1\right] - \mathbb{E}\left[S | X_0 \sim U\right]}{\sqrt{\text{Var}(S)}} \to 0 
+\]
+As we will see, in the case where \(d \eta^2 > 1\), we will be able to recover the root better than random by using the estimator \(S\).</p>
+<div class="claim"> [Second Moment Argument]<br />
+If \(\frac{\mathbb{E}\left[S | X_0 = 1\right] &#8211; \mathbb{E}\left[S | X_0 \sim U\right]}{\sqrt{\text{Var}(S)}} > \epsilon\), then we can recover \(X_0\) using \(S\) better than random.
+</div>
+<div class="proof">
+Let \(\mu\) denote the measure of \(S\) given a random character at the root, and let \(\mu^+\) denote the measure of \(S\) given that the root is 1. Furthermore, define \(f\) such that \(d\mu^+ = f d\mu\), and of course by definition \(\mu = 1d\mu\). Then<br />
+\begin{align*}<br />
+\left(\mathbb{E}_{\mu^+}[S] &#8211; \mathbb{E}_{\mu}[S]\right)^2 &#038;= \left( \int S (d\mu^+ &#8211; d\mu) \right)^2 \\<br />
+    &#038;= \mathbb{E}_{\mu}\left[S(f-1)\right]^2 \\<br />
+    &#038;\leq \mathbb{E}_{\mu}\left[S^2\right] \cdot \mathbb{E}_{\mu}\left[(f-1)^2\right]<br />
+\end{align*}<br />
+by Cauchy-Schwarz. Furthermore, we can upper bound the expression \(\mathbb{E}_{\mu}\left[(f-1)^2\right]\) by noting that \(\mathbb{E}_{\mu}\left[(f-1)^2\right] \leq d_{\text{TV}}(\mu, \mu^+)\), which follows since \((\mu(v) &#8211; \mu^+(v))^2 \leq \left|\mu(v) &#8211; \mu^+(v)\right|\) for all \(v\). Finally, we can use this to lower bound the total variation distance between \(\mu\) and \(\mu^+\),<br />
+\[<br />
+d_{\text{TV}}(\mu, \mu^+) \geq \frac{\left(\int S (d\mu -d\mu^+)\right)^2}{\mathbb{E}_{\mu}\left[S^2\right]} \geq \epsilon^2<br />
+\]<br />
+where in the final step we used our assumption.
+</div>
+<p>In conclusion, this estimator performs very similarly to the scenario for the &#8220;boring&#8221; case of Model 2! But wait:</p>
+<ol>
+<li> We didn&#8217;t prove that the estimator fails if \(d \eta^2 < 1\). </li>
+<li> Maybe there&#8217;s a better estimator. Maybe even one that works for \(d \eta > 1\)? </li>
+</ol>
+<p>These questions are addressed by the following two theorems.</p>
+<div class="theorem">
+<ol type="a">
+<li> If \(q=2\), then \(d\eta^2 = 1\) is the threshold (and \(q=3,4\) behave similarly). </li>
+<li> If \(q \geq 5\), then \(d\eta^2\) is <em> not </em> the threshold (but we have no simple formula for the threshold!) </li>
+</ol>
+</div>
+<p>In the theorem below, we define <em> count reconstruction </em> estimators to be estimators that just depend on the number of each color \(q\) among the symbols at the leaves of the tree.</p>
+<div class="theorem">
+Count reconstruction estimators will always fail for \(d \eta^2 < 1\).
+</div>
+<p>In particular, \(d\eta^2 = 1\) is the threshold for all sane count reconstruction estimators, like the one we have already described.</p>
+<p>In the interest of time, we won&#8217;t actually prove both of these theorems. We will sketch some easy versions of a &#8220;proof&#8221; of the first of these two theorems.</p>
+<div class="proof">
+[&#8220;Proof&#8221; that \(d\eta^2\) is not threshold for \(q \geq 5 \)] </p>
+<p> <b> Baby version (\(q = \infty\)): </b> We first handle this easier special case. When \( q = \infty \), the labels in the model can be constructed as follows:</p>
+<ol>
+<li> Color root randomly (with some arbitrary color). </li>
+<li> Copy the color with probability \(\eta\). </li>
+<li> Otherwise, choose a completely new color that has <em> not been seen previously </em> and use it. </li>
+</ol>
+<p>Now consider the estimator defined as follows: </em> If two nodes \(u, v \in L_{\ell}\) have the root as their lowest common ancestor and \(x_u = x_v\), then return \(x_v\), and otherwise return an arbitrary color.</p>
+<ol>
+<li> <b> Correctness: </b> Any repeated color must have been given by a common ancestor in this model. For \(u\) and \(v\) as chosen, this ancestor must have been the root! </li>
+<li> <b> Probability of correctness: </b> The probability that we get such leaves is at least the probability that two children of the root survive, and that the branching process survives for each of them.<br />
+\[<br />
+\mathbb{P}[\text{correct}] \geq \eta^2 \cdot \mathbb{P}[\text{branching process survives}]^2 \geq \epsilon<br />
+\]<br />
+where we used the fact that the branching process will survive asymptotically if \(d \eta > 1\). </li>
+</ol>
+</div>
+<p>How do we extend this to large, finite \(q\)? First, we make a definition that will be relevant in our extension.</p>
+<div class="definition">
+An <em> \(r\)-diluted \(d\)-ary tree </em> is a tree where every node at level \(\ell\) must have at least \(d\) descendents at level \(\ell + r\) (if that level exists).
+</div>
+<p>The extension to large, finite \(q\) will result from the following two claims:</p>
+<div class="claim">
+If \(d \eta > 1\), there exist \(r, \epsilon > 0\) such that with probability at least \(\epsilon\), the root cluster contains an infinite \(r\)-diluted binary tree.
+</div>
+<div class="claim">
+Given \(d, r, \epsilon\), there exists a value \(\eta&#8217; < 1\) such that, for the branching process with copy probability \(\eta'\), the probability that the root cluster contains an infinite \(r\)-diluted \((d^{r}-1)\)-ary tree is at least \(1 - \frac{\epsilon}{10q}\).
+</div>
+<p>We will delay proving these two claims for now. Instead, we proceed to give a good estimator for the case where \(q\) is large and finite, given these claims.</p>
+<p> <b> The Estimator: </b> Look for a monochromatic, \(r\)-diluted binary tree of color \(i\). If it exists, return color \(i\).</p>
+<p> By the first claim above, if the root is colored with \(i\), then the probability that such a tree exists with color \(i\) is \(\geq \epsilon\). Now suppose that the root is not colored with \(i\). Then we argue that there is no \(r\)-diluted binary tree of color \(i\) with very high probability. Let \(v\) be a child of a node \(w\) in the tree. First we note that<br />
+\begin{align*}<br />
+  \Pr[x_v \neq i | x_w \neq i] &#038;= \eta + (1 &#8211; \eta)\left(1 &#8211; \frac{1}{q}\right) \\<br />
+  &#038;= 1 &#8211; \frac{1}{q} + \frac{\eta}{q} \underset{q \to<br />
+    \infty}{\longrightarrow} 1<br />
+\end{align*}<br />
+By taking \(q\) large enough such that \(1 &#8211; \frac{1}{q} + \frac{\eta}{q} \geq \eta&#8217;\) where \(\eta&#8217;\) is from the second claim above, we see that we cannot fit an \(r\)-diluted binary tree of color \(i\) in the remainder of the tree (since there is no space for the necessary 2 leaves at any level!).</p>
+<p> Now we&#8217;ll prove the second claim. Before we proceed, we note that this proof was given in detail at the beginning of the proceeding lecture, so the proof here reflects the proof done in that lecture.</p>
+<div class="proof">
+[Proof of Second Claim]<br />
+We proceed by induction on \(k\), the number of iterations. Let \(p_k\) denote the probability that the Claim holds for a tree of depth \(k \cdot r\) (that is, that the root cluster contains an \(r\)-diluted \((d^{r}-1)\)-ary tree of depth \(k \cdot r\) after percolation has occured for \(k \cdot r\) levels). We will use induction to show that, if \(\eta&#8217;\) is large enough, then there is some \(p^* \geq 1 &#8211; \epsilon\) such that \(p_k \geq p^*\) for all \(k\).</p>
+<p> Define the function \(f\) as follows<br />
+\[ f(p) = \Pr[\text{Bin}(d^{r}, p) \geq d^{r} &#8211; 1]\]</p>
+<p>We can see that \(f(1) = 1\), and furthermore that \(f\) is monotone in \(p\). Furthermore, we can compute \(f(p)\) by simply counting.<br />
+  \[ f(p) = p^{d^{r}} + d^{r}(1 &#8211; p)p^{d^{r} &#8211; 1}\]<br />
+Now we compute the derivative of \(f\) at \(p=1\):<br />
+  \[ f'(1) = d^{r} + d^{r}(1 &#8211; p)p^{d^{r} &#8211; 1} = 0\]<br />
+From this, we can conclude that for all sufficiently large \(p^* < 1\), we have that
+  \[
+    f(p^*) \geq p^*
+  \]
+We choose a \(p^* > 1 &#8211; \epsilon\) and \(\eta&#8217; < 1\) such that
+  \[ q = \Pr[\text{connected to } d^{r} \text{ descendents at distance } r] \geq \frac{p^*}{f(p^*)} \]
+Finally, we can proceed to show that \(p_k \geq p^*\) for all \(k\) by induction. We note that \(p_0 = 1\), as the \(0\)-depth tree is just the root. Furthermore
+  \begin{align*}
+    p_{r+1} &#038;\geq q \cdot \Pr[\text{Bin}(d^{\ell}, p_r) \geq d^{\ell} - 1] \\
+    &#038;\geq \frac{p^*}{f(p^*)} \cdot f(p_r) \\
+    &#038;\geq \frac{p^*}{f(p^*)} f(p^*) = p^*
+  \end{align*}
+where the final inequality proceeds from the induction hypothesis that \(p_r \geq p^*\) and the monotonicity of \(f\) in \(p\).
+</div>
+<p>For the rest of the lecture, we will sketch the proof of the theorem that count reconstruction estimators will always fail for \(d \eta^2 < 1\) (the word sketch should be re-emphasized here). Informally, this says that if \(d \eta^2 < 1\), then we cannot reconstruct the character at the root better than random simply by looking at the count statistics on the leaves.
+
+
+<div class="theorem">
+[Kesten-Stigum Theorem] If \(d \eta^2 < 1\), then the count vector \((c_1^{\ell}, \ldots, c_q^{\ell})\) satisfies a CLT that does not depend on the root, where \(c_i^{\ell}\) denotes the number of leaves at level \(\ell\) with color \(i\).
+</div>
+<p>As a concrete example, we can use this CLT for the counts to give a CLT for our earlier count estimator \(S\). Let \(\psi(i) = e_1(i) &#8211; \frac{(1, \ldots, 1)}{q}\). Then we can see that \(y_v = \psi(x_v)\), and we can apply the Kesten-Stigum Theorem for \(S_{\ell} = \sum_{v \in L_{\ell}} y_v\).</p>
+<p> We now give a high level sketch of why the Kesten-Stigum theorem works for this sum. The idea is to use the right martingale. We consider<br />
+exposing one node of the tree at a time, and subtracting the &#8220;expected value&#8221; of the node given its parent to keep the exposed variables zero mean. More formally, define<br />
+\[ S_{\ell}&#8217; = \sum_{v: |v| \leq \ell} (d \eta)^{-|v|}(y_v &#8211; \eta y_{\text{parent}(v)})\]<br />
+where \(|v|\) denotes the level of the vertex \(v\) in the tree (and \(y_{\text{parent}}(\text{root}) = 0\)). Note that \(\mathbb{E}\left[y_v | y_{\text{parent}(v)}\right] = \eta \cdot y_{\text{parent}(v)}\), so whenever we add a vertex to the sum, the expected value of the sum remains the same. By induction, it follows that when we add an entire level to the sum, it remains the same. Hence, we can conclude that</p>
+<ol>
+<li> \(S_{\ell}&#8217;\) is a martingale. </li>
+<li> \(S_{\ell}&#8217; =  \sum_{v: |v| = \ell}  d^{- \ell} \eta^{- \ell} y_v\) </li>
+</ol>
+<p>where the second item follows by induction and noting that the sum telescopes on adjacent levels. We know that \(S_0 = \sum_{v: |v| = 0} (d \eta)^{0} y_v\), so the claim holds for \(\ell = 0\). We now assume that \(S_{\ell}&#8217; =  \sum_{v: |v| = \ell}  d^{- \ell} \eta^{- \ell} y_v\) and prove the statement for \(\ell + 1\).<br />
+\begin{align*}<br />
+S_{\ell + 1}&#8217; &#038;= \sum_{v: |v| \leq \ell+1} (d \eta)^{-|v|}(y_v &#8211; \eta y_{\text{parent}(v)}) \\<br />
+&#038;= S_{\ell} + \sum_{v: |v| = \ell + 1}(d \eta)^{- \ell &#8211; 1}y_v &#8211;  \sum_{v: |v| = \ell + 1} (d \eta)^{-\ell &#8211; 1} \eta y_{\text{parent}(v)} \\<br />
+&#038;= S_{\ell} + \sum_{v: |v| = \ell + 1}(d \eta)^{- \ell &#8211; 1}y_v &#8211; \sum_{v: |v| = \ell} (d \eta)^{\ell} y_v \\<br />
+&#038;= \sum_{v: |v| = \ell + 1}(d \eta)^{- \ell &#8211; 1}y_v<br />
+\end{align*}<br />
+Now, we would like to appeal to a Martingale Central Limit Theorem to establish that \(S_{\ell}&#8217;\) satisfies a CLT that is independent from the root. Note that Azuma&#8217;s inequality would tell us that \(\lim_{\ell \to \infty} S_{\ell}&#8217;\) is highly concentrated around \(S_0\) if we knew that \(\sum\limits_{k=0}^{\infty} c_k^2 < \infty\), where the \(c_k\) denote the Martingale differences. In this case, the leaves would <em> not </em> satisfy a CLT independent of the root.<br />
+\begin{align*}<br />
+\sum_{\ell&#8217; \leq \ell}(S_{\ell&#8217;} &#8211; S_{\ell&#8217; &#8211; 1})^2<br />
+&#038;\geq \sum_{\ell&#8217; \leq \ell} d^{\ell&#8217;}(d \eta)^{- 2 \ell&#8217;} \Theta(1) \\<br />
+&#038;= \Theta(1) \sum_{\ell&#8217; \leq \ell} \left(\frac{1}{d\eta^2}\right)^{\ell&#8217;}<br />
+\end{align*}<br />
+If \(d \eta^2 < 1\),  this series diverges, which means that $c$ satisfies a CLT independent of the root. However, this is not quite enough; a CLT tells us a statement of the form \(\mathbb{P}[\sum X_i \in [a - c\sqrt{n}, a + c\sqrt{n}]]\), but just knowing that the counts are concentrated in an interval does not rule out the possibility of an estimator that can reconstruct the root from the parity of \(c_1^{\ell}\) (or similar functions that are not constrained by being in an interval). We note that it does not really make sense for any sane estimator to use the parity when trying to reconstruct the root, but we still have to rule it out!
+
+So we will additionally need a Local Central Limit Theorem, of the form
+
+<div class="theorem">
+[Local CLT] Let \(X_i\) be iid integer valued and not supported on an arithmetic progression with stride \(\geq 2\). Then we have that<br />
+\[ \Pr\left[\sum\limits_{i=1}^n X_i = m\right] = \frac{1}{\sigma \sqrt{2 \pi}} \text{exp}\left(-\left(\frac{m &#8211; n\mu}{2 \sigma \sqrt{n}}\right)^2\right) + o(1/\sqrt{n})\]<br />
+where \(\sigma^2\) is the variance of \(X_i\) and \(\mu\) is the expectation.
+</div>
+<p>The local CLT helps us rule out &#8220;parity-like&#8221; estimators that still only depend on the counts at the leaves.</p>
+	</div><!-- .entry-content -->
+
+	<footer class="entry-footer">
+		<span class="byline"><span class="author vcard"><img alt='' src='http://2.gravatar.com/avatar/b149ee3c951d4c5946a62273f37709b6?s=49&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/b149ee3c951d4c5946a62273f37709b6?s=98&amp;d=mm&amp;r=g 2x' class='avatar avatar-49 photo' height='49' width='49' /><span class="screen-reader-text">Author </span> <a class="url fn n" href="http://elmos.scripts.mit.edu/mathofdeeplearning/author/elmos/">elmos</a></span></span><span class="posted-on"><span class="screen-reader-text">Posted on </span><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/29/mathematics-of-deep-learning-lecture-6-simple-hierarchical-models/" rel="bookmark"><time class="entry-date published" datetime="2017-05-29T14:49:47+00:00">May 29, 2017</time><time class="updated" datetime="2017-07-01T18:43:53+00:00">July 1, 2017</time></a></span>			</footer><!-- .entry-footer -->
+</article><!-- #post-## -->
+
+	<nav class="navigation post-navigation" role="navigation">
+		<h2 class="screen-reader-text">Post navigation</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/28/mathematics-of-deep-learning-lecture-5-random-sparse-nets-etc/" rel="prev"><span class="meta-nav" aria-hidden="true">Previous</span> <span class="screen-reader-text">Previous post:</span> <span class="post-title">Mathematics of Deep Learning: Lecture 5 &#8211; Random Sparse Nets etc.</span></a></div><div class="nav-next"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-7-recovering-tree-models/" rel="next"><span class="meta-nav" aria-hidden="true">Next</span> <span class="screen-reader-text">Next post:</span> <span class="post-title">Mathematics of Deep Learning: Lecture 7 &#8211; Recovering Tree Models</span></a></div></div>
+	</nav>
+	</main><!-- .site-main -->
+
+	
+</div><!-- .content-area -->
+
+
+	<aside id="secondary" class="sidebar widget-area" role="complementary">
+		<section id="search-2" class="widget widget_search">
+<form role="search" method="get" class="search-form" action="http://elmos.scripts.mit.edu/mathofdeeplearning/">
+	<label>
+		<span class="screen-reader-text">Search for:</span>
+		<input type="search" class="search-field" placeholder="Search &hellip;" value="" name="s" />
+	</label>
+	<button type="submit" class="search-submit"><span class="screen-reader-text">Search</span></button>
+</form>
+</section>		<section id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widget-title">Recent Posts</h2>		<ul>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-8-hierarchical-generative-models-for-deep-learning/">Mathematics of Deep Learning: Lecture 8 &#8211; Hierarchical Generative Models for Deep Learning</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/06/mathematics-of-deep-learning-lecture-7-recovering-tree-models/">Mathematics of Deep Learning: Lecture 7 &#8211; Recovering Tree Models</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/29/mathematics-of-deep-learning-lecture-6-simple-hierarchical-models/">Mathematics of Deep Learning: Lecture 6 &#8211; Simple hierarchical models</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/28/mathematics-of-deep-learning-lecture-5-random-sparse-nets-etc/">Mathematics of Deep Learning: Lecture 5 &#8211; Random Sparse Nets etc.</a>
+						</li>
+					<li>
+				<a href="http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/08/mathematics-of-deep-learning-lecture-4/">Mathematics of Deep Learning: Lecture 4 &#8211; PAC Learning and Deep Nets</a>
+						</li>
+				</ul>
+		</section>		<section id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widget-title">Recent Comments</h2><ul id="recentcomments"></ul></section><section id="archives-2" class="widget widget_archive"><h2 class="widget-title">Archives</h2>		<ul>
+			<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/07/'>July 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/05/'>May 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/04/'>April 2017</a></li>
+	<li><a href='http://elmos.scripts.mit.edu/mathofdeeplearning/2017/03/'>March 2017</a></li>
+		</ul>
+		</section><section id="categories-2" class="widget widget_categories"><h2 class="widget-title">Categories</h2>		<ul>
+	<li class="cat-item cat-item-1"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/category/uncategorized/" >Uncategorized</a>
+</li>
+		</ul>
+</section><section id="meta-2" class="widget widget_meta"><h2 class="widget-title">Meta</h2>			<ul>
+						<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/wp-login.php">Log in</a></li>
+			<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/feed/">Entries <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/comments/feed/">Comments <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="https://wordpress.org/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform.">WordPress.org</a></li>			</ul>
+			</section>	</aside><!-- .sidebar .widget-area -->
+
+		</div><!-- .site-content -->
+
+		<footer id="colophon" class="site-footer" role="contentinfo">
+			
+			
+			<div class="site-info">
+								<span class="site-title"><a href="http://elmos.scripts.mit.edu/mathofdeeplearning/" rel="home">Mathematical Aspects of Deep Learning</a></span>
+				<a href="https://wordpress.org/">Proudly powered by WordPress</a>
+			</div><!-- .site-info -->
+		</footer><!-- .site-footer -->
+	</div><!-- .site-inner -->
+</div><!-- .site -->
+
+	<div style="display:none">
+	<div class="grofile-hash-map-b149ee3c951d4c5946a62273f37709b6">
+	</div>
+	</div>
+<script type='text/javascript' src='http://s0.wp.com/wp-content/js/devicepx-jetpack.js?ver=201727'></script>
+<script type='text/javascript' src='http://s.gravatar.com/js/gprofiles.js?ver=2017Julaa'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/plugins/jetpack/modules/wpgroho.js?ver=4.5.2'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/skip-link-focus-fix.js?ver=20160412'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var screenReaderText = {"expand":"expand child menu","collapse":"collapse child menu"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-content/themes/twentysixteen/js/functions.js?ver=20160412'></script>
+<script type='text/javascript' src='http://elmos.scripts.mit.edu/mathofdeeplearning/wp-includes/js/wp-embed.min.js?ver=4.5.2'></script>
+<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=default&#038;ver=1.3.6'></script>
+<script type='text/javascript' src='http://stats.wp.com/e-201727.js' async defer></script>
+<script type='text/javascript'>
+	_stq = window._stq || [];
+	_stq.push([ 'view', {v:'ext',j:'1:4.4.2',blog:'122429706',post:'179',tz:'0',srv:'elmos.scripts.mit.edu'} ]);
+	_stq.push([ 'clickTrackerInit', '122429706', '179' ]);
+</script>
+</body>
+</html>
